@@ -1,12 +1,13 @@
-import { Component, signal } from '@angular/core';
+import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { LoaderComponent } from './shared/components/loader/loader';
 
 @Component({
-  imports: [RouterOutlet],
+  imports: [RouterOutlet, LoaderComponent],
   selector: 'app-root',
-  styleUrl: './app.css',
-  templateUrl: './app.html',
+  template: `
+    <router-outlet />
+    <app-loader />
+  `,
 })
-export class App {
-  protected readonly title = signal('vehicle-renting-management');
-}
+export class App {}

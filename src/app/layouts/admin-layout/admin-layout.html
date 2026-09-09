@@ -1,0 +1,39 @@
+<div class="flex min-h-screen bg-gray-100">
+  <aside class="flex w-64 flex-col bg-slate-900 text-white">
+    <div class="border-b border-slate-700 px-6 py-5">
+      <h1 class="text-lg font-semibold">Vehicle Rental</h1>
+      <p class="text-sm text-slate-400">Admin Panel</p>
+    </div>
+
+    <nav class="flex flex-1 flex-col gap-1 p-4">
+      @for (item of navItems; track item.route) {
+        <a
+          [routerLink]="item.route"
+          routerLinkActive="bg-blue-600 text-white"
+          class="flex items-center gap-3 rounded-lg px-3 py-2 text-slate-300 transition hover:bg-slate-800 hover:text-white"
+        >
+          <ng-icon [name]="item.icon" class="size-5" />
+          <span>{{ item.label }}</span>
+        </a>
+      }
+    </nav>
+  </aside>
+
+  <div class="flex min-h-screen flex-1 flex-col">
+    <header class="flex items-center justify-between border-b border-gray-200 bg-white px-6 py-4">
+      <p class="text-sm text-gray-500">Admin layout shell</p>
+      <button
+        type="button"
+        class="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-gray-600 hover:bg-gray-100"
+        disabled
+      >
+        <ng-icon name="heroArrowRightOnRectangle" class="size-5" />
+        Logout
+      </button>
+    </header>
+
+    <main class="flex-1 p-6">
+      <router-outlet />
+    </main>
+  </div>
+</div>
