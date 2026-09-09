@@ -1,0 +1,5 @@
+{
+  "tailwindCSS.experimental.configFile": "src/styles.css",
+  "tailwindCSS.classAttributes": ["class", "ngClass", "routerLinkActive"],
+  "css.validate": false
+}

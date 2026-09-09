@@ -1,0 +1,145 @@
+<div class="relative flex h-dvh flex-col overflow-hidden mesh-bg safe-area-top safe-area-bottom">
+  <div
+    class="pointer-events-none absolute -left-24 top-10 size-48 rounded-full bg-indigo-500/30 blur-3xl animate-float sm:size-72"
+  ></div>
+  <div
+    class="pointer-events-none absolute -right-16 top-1/3 size-64 rounded-full bg-cyan-400/20 blur-3xl animate-float-delayed sm:size-96"
+  ></div>
+  <div
+    class="pointer-events-none absolute bottom-0 left-1/3 size-56 rounded-full bg-violet-500/25 blur-3xl animate-pulse-glow sm:size-80"
+  ></div>
+
+  <div class="relative z-10 flex min-h-0 flex-1 flex-col overflow-y-auto overflow-x-hidden lg:flex-row">
+    <section
+      class="hidden flex-1 flex-col justify-center px-6 py-10 lg:flex lg:px-16 xl:px-24"
+    >
+      <div
+        class="inline-flex w-fit items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-sm text-cyan-200 backdrop-blur-md"
+      >
+        <ng-icon name="heroSparkles" class="size-4 shrink-0" />
+        Premium fleet management
+      </div>
+
+      <h1
+        class="mt-8 max-w-xl text-balance text-4xl font-extrabold leading-tight tracking-tight text-white xl:text-6xl"
+      >
+        Drive your rental business with
+        <span class="gradient-text">clarity & control</span>
+      </h1>
+
+      <p class="mt-6 max-w-lg text-base leading-relaxed text-slate-300 lg:text-lg">
+        VeloRent Admin gives you a cinematic command center for vehicles, customers,
+        bookings, and revenue — built for speed and style.
+      </p>
+
+      <div class="mt-10 grid max-w-lg gap-4 sm:grid-cols-3">
+        <div class="glass-panel rounded-2xl p-4">
+          <ng-icon name="heroTruck" class="size-6 text-cyan-300" />
+          <p class="mt-3 text-xl font-bold text-white sm:text-2xl">Fleet</p>
+          <p class="text-xs text-slate-400">Live inventory</p>
+        </div>
+        <div class="glass-panel rounded-2xl p-4">
+          <ng-icon name="heroChartBar" class="size-6 text-violet-300" />
+          <p class="mt-3 text-xl font-bold text-white sm:text-2xl">Insights</p>
+          <p class="text-xs text-slate-400">Smart analytics</p>
+        </div>
+        <div class="glass-panel rounded-2xl p-4">
+          <ng-icon name="heroBolt" class="size-6 text-amber-300" />
+          <p class="mt-3 text-xl font-bold text-white sm:text-2xl">Fast</p>
+          <p class="text-xs text-slate-400">Real-time ops</p>
+        </div>
+      </div>
+    </section>
+
+    <section
+      class="flex flex-1 flex-col items-center justify-center px-4 py-8 sm:px-6 sm:py-12 lg:px-12"
+    >
+      <div class="mb-6 flex w-full max-w-md items-center gap-3 lg:hidden">
+        <div
+          class="flex size-12 shrink-0 items-center justify-center rounded-xl bg-linear-to-br from-indigo-500 via-violet-500 to-cyan-400 shadow-lg shadow-indigo-500/40"
+        >
+          <ng-icon name="heroTruck" class="size-6 text-white" />
+        </div>
+        <div class="min-w-0">
+          <p class="truncate text-lg font-bold text-white">VeloRent Admin</p>
+          <p class="text-sm text-slate-400">Sign in to continue</p>
+        </div>
+      </div>
+
+      <div class="gradient-border w-full max-w-md rounded-3xl p-px">
+        <div class="glass-panel rounded-3xl p-6 sm:p-8 lg:p-10">
+          <div class="mb-6 text-center sm:mb-8">
+            <div
+              class="mx-auto mb-4 flex size-14 items-center justify-center rounded-2xl bg-linear-to-br from-indigo-500 via-violet-500 to-cyan-400 shadow-lg shadow-indigo-500/40 sm:mb-5 sm:size-16"
+            >
+              <ng-icon name="heroTruck" class="size-7 text-white sm:size-8" />
+            </div>
+            <h2 class="text-xl font-bold text-white sm:text-2xl">Welcome back</h2>
+            <p class="mt-2 text-sm text-slate-400">Sign in to your admin workspace</p>
+          </div>
+
+          <form class="space-y-4 sm:space-y-5" [formGroup]="form" (ngSubmit)="onSubmit()">
+            <div>
+              <label class="mb-2 block text-sm font-medium text-slate-300" for="username">
+                Username
+              </label>
+              <input
+                id="username"
+                type="text"
+                formControlName="username"
+                autocomplete="username"
+                placeholder="admin"
+                class="block min-h-11 w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-base text-white placeholder:text-slate-500 transition focus:border-cyan-400/50 focus:outline-none focus:ring-2 focus:ring-cyan-400/30"
+                [class.border-rose-400/70]="form.controls.username.touched && form.controls.username.invalid"
+              />
+              @if (form.controls.username.touched && form.controls.username.invalid) {
+                <p class="mt-1.5 text-sm text-rose-300">Username is required</p>
+              }
+            </div>
+
+            <div>
+              <label class="mb-2 block text-sm font-medium text-slate-300" for="password">
+                Password
+              </label>
+              <input
+                id="password"
+                type="password"
+                formControlName="password"
+                autocomplete="current-password"
+                placeholder="••••••••"
+                class="block min-h-11 w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-base text-white placeholder:text-slate-500 transition focus:border-cyan-400/50 focus:outline-none focus:ring-2 focus:ring-cyan-400/30"
+                [class.border-rose-400/70]="form.controls.password.touched && form.controls.password.invalid"
+              />
+              @if (form.controls.password.touched && form.controls.password.invalid) {
+                <p class="mt-1.5 text-sm text-rose-300">Password is required</p>
+              }
+            </div>
+
+            @if (errorMessage()) {
+              <div
+                class="rounded-xl border border-rose-400/30 bg-rose-500/10 px-4 py-3 text-sm text-rose-200"
+              >
+                {{ errorMessage() }}
+              </div>
+            }
+
+            <button
+              type="submit"
+              class="touch-target group relative w-full overflow-hidden rounded-xl bg-linear-to-r from-indigo-500 via-violet-500 to-cyan-500 px-4 py-3.5 text-base font-semibold text-white shadow-lg shadow-indigo-500/30 transition hover:shadow-indigo-500/50 active:scale-[0.98] sm:hover:scale-[1.02]"
+            >
+              <span class="relative z-10 inline-flex items-center justify-center gap-2">
+                <ng-icon name="heroRocketLaunch" class="size-5" />
+                Launch dashboard
+              </span>
+            </button>
+          </form>
+
+          <p class="mt-5 text-center text-xs leading-relaxed text-slate-500 sm:mt-6">
+            Demo credentials:
+            <span class="block text-slate-300 sm:inline sm:ml-1">admin / admin123</span>
+          </p>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
