@@ -1,38 +1,158 @@
-<div class="flex min-h-screen bg-gray-100">
-  <aside class="flex w-64 flex-col bg-slate-900 text-white">
-    <div class="border-b border-slate-700 px-6 py-5">
-      <h1 class="text-lg font-semibold">Vehicle Rental</h1>
-      <p class="text-sm text-slate-400">Admin Panel</p>
+<div class="relative min-h-full overflow-x-hidden bg-slate-50 text-slate-900">
+  <div
+    class="pointer-events-none absolute inset-x-0 top-14 h-48 bg-linear-to-br from-indigo-100 via-violet-50 to-cyan-50 sm:h-64 lg:h-72"
+  ></div>
+
+  @if (sidebarOpen()) {
+    <button
+      type="button"
+      class="fixed inset-0 z-30 bg-slate-900/60 backdrop-blur-sm lg:hidden"
+      aria-label="Close navigation menu"
+      (click)="closeSidebar()"
+    ></button>
+  }
+
+  <aside
+    class="fixed bottom-0 left-0 top-14 z-40 flex w-[min(100vw-3rem,18rem)] max-w-[85vw] flex-col border-r border-white/10 bg-surface-900 text-white shadow-2xl shadow-indigo-950/50 transition-transform duration-300 ease-out safe-area-bottom -translate-x-full lg:inset-y-0 lg:w-72 lg:max-w-none lg:translate-x-0"
+    [class.translate-x-0]="sidebarOpen()"
+  >
+    <div class="shell-header justify-between border-white/10 lg:px-5">
+      <div class="flex min-w-0 items-center gap-2.5">
+        <div
+          class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-linear-to-br from-indigo-500 via-violet-500 to-cyan-400 shadow-md shadow-indigo-500/40"
+        >
+          <ng-icon name="heroTruck" class="size-4 text-white" />
+        </div>
+        <div class="min-w-0 leading-tight">
+          <h1 class="truncate text-sm font-bold tracking-tight">VeloRent</h1>
+          <p class="truncate text-[0.65rem] text-slate-400">Admin Panel</p>
+        </div>
+      </div>
+
+      <button
+        type="button"
+        class="inline-flex size-8 shrink-0 items-center justify-center rounded-lg text-slate-400 transition hover:bg-white/10 hover:text-white lg:hidden"
+        aria-label="Close navigation menu"
+        (click)="closeSidebar()"
+      >
+        <ng-icon name="heroXMark" class="size-5" />
+      </button>
     </div>
 
-    <nav class="flex flex-1 flex-col gap-1 p-4">
+    <nav class="flex flex-1 flex-col gap-1 overflow-y-auto p-3 sm:p-4">
       @for (item of navItems; track item.route) {
         <a
           [routerLink]="item.route"
-          routerLinkActive="bg-blue-600 text-white"
-          class="flex items-center gap-3 rounded-lg px-3 py-2 text-slate-300 transition hover:bg-slate-800 hover:text-white"
+          routerLinkActive="nav-glow bg-linear-to-r from-indigo-500/90 to-violet-500/80 text-white [&_span:first-child]:bg-white/15"
+          [routerLinkActiveOptions]="{ exact: false }"
+          class="group flex min-h-10 items-center gap-3 rounded-xl px-3 py-2 text-slate-300 transition hover:bg-white/5 hover:text-white"
+          (click)="closeSidebar()"
         >
-          <ng-icon [name]="item.icon" class="size-5" />
-          <span>{{ item.label }}</span>
+          <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-white/5">
+            <ng-icon [name]="item.icon" class="size-4" />
+          </span>
+          <span class="truncate text-sm font-medium">{{ item.label }}</span>
         </a>
       }
     </nav>
+
+    <div class="hidden border-t border-white/10 p-4 sm:block">
+      <div class="rounded-2xl bg-linear-to-br from-indigo-500/20 to-cyan-400/10 p-4">
+        <div class="flex items-center gap-2 text-cyan-200">
+          <ng-icon name="heroSparkles" class="size-4 shrink-0" />
+          <span class="text-xs font-semibold uppercase tracking-wider">Pro tip</span>
+        </div>
+        <p class="mt-2 text-sm leading-relaxed text-slate-300">
+          Modules unlock as you build — vehicles, bookings, and ledger are next.
+        </p>
+      </div>
+    </div>
   </aside>
 
-  <div class="flex min-h-screen flex-1 flex-col">
-    <header class="flex items-center justify-between border-b border-gray-200 bg-white px-6 py-4">
-      <p class="text-sm text-gray-500">Admin layout shell</p>
+  <header
+    class="shell-header fixed top-0 right-0 z-50 justify-between gap-3 border-slate-200/80 bg-white shadow-sm shadow-slate-200/60 left-0 lg:left-72 lg:px-5"
+  >
+    <div class="flex min-w-0 items-center gap-2.5">
       <button
         type="button"
-        class="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-gray-600 hover:bg-gray-100"
-        disabled
+        class="inline-flex size-8 shrink-0 items-center justify-center rounded-lg border border-slate-200/80 bg-slate-50 text-slate-700 transition hover:border-indigo-200 hover:bg-indigo-50 hover:text-indigo-600 lg:hidden"
+        aria-label="Open navigation menu"
+        (click)="toggleSidebar()"
       >
-        <ng-icon name="heroArrowRightOnRectangle" class="size-5" />
-        Logout
+        <ng-icon name="heroBars3" class="size-5" />
       </button>
-    </header>
 
-    <main class="flex-1 p-6">
+      <div class="hidden h-8 w-px shrink-0 bg-slate-200 lg:block"></div>
+
+      <div class="min-w-0 leading-tight">
+        <p class="truncate text-[0.65rem] font-semibold uppercase tracking-[0.12em] text-indigo-500">
+          VeloRent Admin
+        </p>
+        <h2 class="truncate text-sm font-bold text-slate-900">{{ pageTitle() }}</h2>
+      </div>
+    </div>
+
+    <div class="relative shrink-0">
+      <button
+        type="button"
+        class="inline-flex items-center gap-2 rounded-full border border-slate-200/80 bg-slate-50 px-2.5 py-1 transition hover:border-indigo-200 hover:bg-indigo-50"
+        aria-haspopup="dialog"
+        [attr.aria-expanded]="userMenuOpen()"
+        (click)="toggleUserMenu()"
+      >
+        <div
+          class="flex size-7 items-center justify-center rounded-full bg-linear-to-br from-indigo-500 via-violet-500 to-cyan-400 text-[0.65rem] font-bold text-white"
+        >
+          A
+        </div>
+        <span class="text-xs font-semibold text-slate-800">Admin</span>
+      </button>
+
+      @if (userMenuOpen()) {
+        <button
+          type="button"
+          class="fixed inset-0 z-40 cursor-default bg-transparent"
+          aria-label="Close account menu"
+          (click)="closeUserMenu()"
+        ></button>
+
+        <div
+          class="absolute right-0 top-[calc(100%+0.5rem)] z-50 w-64 overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-xl shadow-slate-300/40"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Account menu"
+        >
+          <div class="border-b border-slate-100 bg-linear-to-r from-indigo-50 via-violet-50 to-cyan-50 px-4 py-4">
+            <div class="flex items-center gap-3">
+              <div
+                class="flex size-10 items-center justify-center rounded-full bg-linear-to-br from-indigo-500 via-violet-500 to-cyan-400 text-sm font-bold text-white shadow-md shadow-indigo-500/30"
+              >
+                A
+              </div>
+              <div class="min-w-0">
+                <p class="truncate text-sm font-bold text-slate-900">Admin</p>
+                <p class="truncate text-xs text-slate-500">admin@velorent.local</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="p-2">
+            <button
+              type="button"
+              class="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-rose-600 transition hover:bg-rose-50"
+              (click)="logout()"
+            >
+              <ng-icon name="heroArrowRightOnRectangle" class="size-5" />
+              Logout
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  </header>
+
+  <div class="relative min-w-0 bg-slate-50 pt-14 lg:pl-72">
+    <main class="relative min-w-0 px-3 py-4 sm:px-6 sm:py-6 lg:py-8">
       <router-outlet />
     </main>
   </div>

@@ -14,6 +14,7 @@
 | **API Base URL** | `https://freeapi.gerasim.in` |
 | **API Docs (Swagger)** | [https://freeapi.gerasim.in/index.html](https://freeapi.gerasim.in/index.html) → **CarRentalApp** tag |
 | **UI Libraries** | Tailwind CSS v4, ng-icons (Heroicons default; swap icon sets as needed) |
+| **Theming** | User preference: **Light** / **Dark** (persisted per user in `localStorage`) |
 
 ### Purpose
 
@@ -29,6 +30,7 @@ Build a full-featured **Vehicle Renting Management Admin App** from scratch usin
 | 2 | **Component Creation** | Build feature modules/pages with reusable shared components |
 | 3 | **API Integration** | Connect all screens to CarRentalApp endpoints with typed models and error handling |
 | 4 | **Optimize App** | Lazy loading, OnPush, signals, trackBy, debounce, caching, and bundle awareness |
+| 5 | **User Theme** | Light / dark mode toggle with per-user persistence and Tailwind `dark:` variants |
 
 ---
 
@@ -254,6 +256,45 @@ interface RentCustomer {
 
 ---
 
+### 3.7 User Theme (Light / Dark)
+
+> Per-user UI preference — not tied to the API. Each admin chooses their own theme; choice survives refresh and logout/login on the same browser.
+
+| Feature | Detail |
+|---------|--------|
+| Options | `light`, `dark` |
+| Storage | `localStorage` key e.g. `vehicle-rental-theme` |
+| Default | `light` (or `dark` if `prefers-color-scheme: dark` and no saved preference) |
+| Apply | Toggle `class="dark"` on `<html>` (Tailwind CSS v4 class strategy) |
+| UI control | Theme toggle in **top bar** and/or **Admin account menu** |
+| Scope | Login page, admin layout (sidebar, top bar), dashboard, and all future feature pages |
+
+**Service: `ThemeService`**
+
+```typescript
+type AppTheme = 'light' | 'dark';
+
+// API (signals)
+theme: Signal<AppTheme>;
+isDark: Signal<boolean>;
+
+setTheme(theme: AppTheme): void;
+toggleTheme(): void;
+initTheme(): void;  // call from APP_INITIALIZER or app bootstrap
+```
+
+**Implementation notes:**
+
+1. On app start → read `localStorage` → apply theme before first paint (avoid flash)
+2. On toggle → update signal, `localStorage`, and `<html>` class
+3. Use Tailwind `dark:` variants for backgrounds, text, borders, cards, inputs, tables
+4. Keep brand gradients (indigo / violet / cyan) consistent in both themes; adjust surfaces only
+5. Optional: respect `prefers-color-scheme` only when user has not chosen a theme yet
+
+**Interview topics:** Signals, `localStorage`, Tailwind dark mode, avoiding FOUC, user preference vs system preference.
+
+---
+
 ## 4. Common API Response Wrapper
 
 All CarRentalApp endpoints return:
@@ -297,7 +338,8 @@ src/
 │   │       ├── car.service.ts
 │   │       ├── customer.service.ts
 │   │       ├── booking.service.ts
-│   │       └── dashboard.service.ts
+│   │       ├── dashboard.service.ts
+│   │       └── theme.service.ts   # light / dark user preference
 │   ├── layouts/
 │   │   └── admin-layout/          # sidebar + navbar shell for auth routes
 │   ├── shared/
@@ -305,6 +347,7 @@ src/
 │   │   │   ├── navbar/
 │   │   │   ├── sidebar/
 │   │   │   ├── loader/
+│   │   │   ├── theme-toggle/      # light / dark switch (ng-icons sun/moon)
 │   │   │   ├── confirm-dialog/
 │   │   │   └── toast/             # success / error feedback
 │   │   └── pipes/
@@ -322,7 +365,7 @@ src/
 ├── environments/
 │   ├── environment.ts
 │   └── environment.prod.ts
-├── styles.css              # @import 'tailwindcss' (configured by ng new)
+├── styles.css              # @import 'tailwindcss'; @custom-variant dark (&:where(.dark, .dark *));
 └── .postcssrc.json         # @tailwindcss/postcss plugin
 ```
 
@@ -474,6 +517,41 @@ Add to `styles.css` if installed:
 @plugin '@tailwindcss/forms';
 ```
 
+### 7.7 User Theme (Light / Dark)
+
+**`src/styles.css`** — enable class-based dark mode (Tailwind v4):
+
+```css
+@import 'tailwindcss';
+@custom-variant dark (&:where(.dark, .dark *));
+```
+
+**Avoid flash on load** — optional inline script in `index.html` before `</head>`:
+
+```html
+<script>
+  (function () {
+    const key = 'vehicle-rental-theme';
+    const saved = localStorage.getItem(key);
+    const theme =
+      saved === 'light' || saved === 'dark'
+        ? saved
+        : window.matchMedia('(prefers-color-scheme: dark)').matches
+          ? 'dark'
+          : 'light';
+    if (theme === 'dark') document.documentElement.classList.add('dark');
+  })();
+</script>
+```
+
+**Usage in templates:**
+
+```html
+<div class="bg-white text-slate-900 dark:bg-surface-900 dark:text-slate-100">
+  ...
+</div>
+```
+
 ---
 
 ## 8. Environment Configuration
@@ -527,7 +605,7 @@ export const environment = {
 
 ---
 
-### Phase 3 — Shared UI Building Blocks (Steps 19–22)
+### Phase 3 — Shared UI Building Blocks (Steps 19–27)
 
 | Step | Task | Done |
 |------|------|------|
@@ -535,10 +613,15 @@ export const environment = {
 | 3.2 | Build `ConfirmDialogComponent` (reusable delete confirmation) | [ ] |
 | 3.3 | Build `ToastComponent` + `ToastService` for success/error messages | [ ] |
 | 3.4 | Add empty-state template pattern (icon + message) for lists with no data | [ ] |
+| 3.5 | Create `ThemeService` — `light` / `dark`, `toggleTheme()`, `localStorage` persistence | [ ] |
+| 3.6 | Enable Tailwind dark mode on `<html>`; call `initTheme()` on app bootstrap (avoid flash) | [ ] |
+| 3.7 | Build `ThemeToggleComponent` (sun/moon ng-icons) in top bar or Admin menu | [ ] |
+| 3.8 | Add `dark:` variants to login, admin layout, dashboard, loader | [ ] |
+| 3.9 | Verify theme persists after refresh; both themes readable on mobile + desktop | [ ] |
 
 ---
 
-### Phase 4 — Vehicles Module (Steps 23–30)
+### Phase 4 — Vehicles Module (Steps 28–35)
 
 | Step | Task | Done |
 |------|------|------|
@@ -553,7 +636,7 @@ export const environment = {
 
 ---
 
-### Phase 5 — Customer Ledger Module (Steps 31–38)
+### Phase 5 — Customer Ledger Module (Steps 36–43)
 
 | Step | Task | Done |
 |------|------|------|
@@ -568,7 +651,7 @@ export const environment = {
 
 ---
 
-### Phase 6 — Book Vehicle Module (Steps 39–46)
+### Phase 6 — Book Vehicle Module (Steps 44–51)
 
 | Step | Task | Done |
 |------|------|------|
@@ -583,7 +666,7 @@ export const environment = {
 
 ---
 
-### Phase 7 — Booking Listing Module (Steps 47–53)
+### Phase 7 — Booking Listing Module (Steps 52–58)
 
 | Step | Task | Done |
 |------|------|------|
@@ -597,7 +680,7 @@ export const environment = {
 
 ---
 
-### Phase 8 — Dashboard Module (Steps 54–58)
+### Phase 8 — Dashboard Module (Steps 59–63)
 
 | Step | Task | Done |
 |------|------|------|
@@ -609,7 +692,7 @@ export const environment = {
 
 ---
 
-### Phase 9 — Polish & Real-Time UX (Steps 59–64)
+### Phase 9 — Polish & Real-Time UX (Steps 64–69)
 
 | Step | Task | Done |
 |------|------|------|
@@ -622,7 +705,7 @@ export const environment = {
 
 ---
 
-### Phase 10 — Optimize (Steps 65–70)
+### Phase 10 — Optimize (Steps 70–75)
 
 | Step | Task | Done |
 |------|------|------|
@@ -654,6 +737,7 @@ export const environment = {
 | Environment-based config | API base URL |
 | Error handling | Interceptor + component level |
 | Tailwind CSS utility classes | Layout, tables, forms, responsive sidebar |
+| User theme (light / dark) | `ThemeService`, `localStorage`, Tailwind `dark:` variants |
 
 ### Common Interview Questions This Project Covers
 
@@ -667,12 +751,30 @@ export const environment = {
 8. How do you handle loading and error states in HTTP calls?
 9. What are HTTP interceptors and when do you use them?
 10. How do you calculate derived state reactively (bill amount)?
+11. How do you implement a user-selectable light/dark theme in Angular + Tailwind?
 
 ---
 
 ## 11. UI / UX Guidelines (Admin)
 
-- **Color scheme:** `bg-slate-900` dark sidebar + `bg-blue-600` primary actions
+### Theme (Light / Dark)
+
+| Area | Light | Dark |
+|------|-------|------|
+| Page background | `bg-slate-50` | `dark:bg-surface-950` |
+| Cards / panels | `bg-white border-slate-200` | `dark:bg-surface-900 dark:border-white/10` |
+| Sidebar | `bg-surface-900` (same in both) | same — brand shell stays dark |
+| Top bar | `bg-white border-slate-200` | `dark:bg-surface-900 dark:border-white/10 dark:text-slate-100` |
+| Primary actions | `bg-indigo-600` gradient accents | same gradients; slightly higher contrast on text |
+| Text | `text-slate-900` / `text-slate-500` | `dark:text-slate-100` / `dark:text-slate-400` |
+
+- **Toggle placement:** Top bar (quick access) and/or Admin account menu
+- **Persistence:** `localStorage` per browser user — not sent to API
+- **No flash:** Apply saved theme in `index.html` inline script or `APP_INITIALIZER` before bootstrap
+
+### General
+
+- **Color scheme:** `bg-slate-900` dark sidebar + indigo/violet/cyan gradient primary actions
 - **Layout:** `flex` admin shell — fixed sidebar (`w-64`) + top navbar with logout; `md:` breakpoints for mobile collapse
 - **Tables:** `min-w-full divide-y divide-gray-200` with `hover:bg-gray-50` rows and action icon buttons
 - **Forms:** Tailwind inputs — `block w-full rounded-md border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-blue-500`; red border + text for validation errors
@@ -734,8 +836,9 @@ export const environment = {
 | Routing & guards | ✅ Fixed | `authGuard`, `guestGuard`, admin layout parent route |
 | Customer Ledger | ✅ Fixed | Load booking history on demand (avoid N+1) |
 | Real-time scenarios | ✅ Defined | Bill calculator, debounced filters, toasts |
-| Interview focus | ✅ Built in | 70 small steps map to Angular 22 concepts |
+| Interview focus | ✅ Built in | 75 small steps map to Angular 22 concepts |
 | Tech stack | ✅ Aligned | Angular 22 + Tailwind CSS v4 + ng-icons |
+| User theme | ✅ Planned | Light / dark per user via `ThemeService` + `localStorage` (Phase 3.5–3.9) |
 | Symlink command | ⚠️ Optional | Use `node_modules` (no space) in path |
 
 ---
@@ -748,8 +851,9 @@ export const environment = {
 | Project created | ✅ Done (`ng new` with Tailwind CSS) |
 | Tailwind configured | ✅ Done (via `styles.css` + `.postcssrc.json`) |
 | ng-icons | ✅ Installed (`@ng-icons/core`, `@ng-icons/heroicons`) |
-| Implementation | ⏳ Not started |
+| User theme (light / dark) | ⏳ Planned (Phase 3.5–3.9) |
+| Implementation | ⏳ In progress (Phases 1–2 + UI shell done) |
 
 ---
 
-*Last updated: September 10, 2026 — ng-icons adoption*
+*Last updated: September 10, 2026 — user theme (light / dark) added to plan*

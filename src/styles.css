@@ -1,3 +1,166 @@
-/* You can add global styles to this file, and also import other style files */
-
 @import 'tailwindcss';
+
+@theme {
+  --font-sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+  --color-surface-950: #070b14;
+  --color-surface-900: #0c1222;
+  --color-surface-800: #151d32;
+  --color-brand-400: #818cf8;
+  --color-brand-500: #6366f1;
+  --color-brand-600: #4f46e5;
+  --color-accent-400: #22d3ee;
+  --color-accent-500: #06b6d4;
+  --color-glow-violet: #8b5cf6;
+  --color-glow-cyan: #22d3ee;
+}
+
+@layer base {
+  html {
+    @apply h-full antialiased;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  body {
+    @apply min-h-full overflow-x-hidden overflow-y-auto bg-surface-950 font-sans text-slate-100;
+  }
+
+  body.sidebar-open {
+    @apply overflow-hidden;
+  }
+}
+
+@layer utilities {
+  .mesh-bg {
+    background-color: var(--color-surface-950);
+    background-image:
+      radial-gradient(at 0% 0%, rgb(99 102 241 / 0.35) 0, transparent 50%),
+      radial-gradient(at 100% 0%, rgb(34 211 238 / 0.2) 0, transparent 45%),
+      radial-gradient(at 50% 100%, rgb(139 92 246 / 0.25) 0, transparent 50%);
+  }
+
+  .glass-panel {
+    @apply border border-white/10 bg-white/5 shadow-2xl shadow-indigo-950/40 backdrop-blur-xl;
+  }
+
+  .glass-card {
+    @apply rounded-2xl border border-white/10 bg-white/80 shadow-xl shadow-slate-900/5 backdrop-blur-md;
+  }
+
+  .gradient-text {
+    @apply bg-linear-to-r from-indigo-400 via-violet-400 to-cyan-400 bg-clip-text text-transparent;
+  }
+
+  .gradient-border {
+    position: relative;
+  }
+
+  .gradient-border::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(135deg, rgb(99 102 241 / 0.8), rgb(34 211 238 / 0.6));
+    -webkit-mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+
+  .nav-glow {
+    box-shadow:
+      0 0 0 1px rgb(99 102 241 / 0.3),
+      0 8px 32px rgb(99 102 241 / 0.25);
+  }
+
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom, 0);
+  }
+
+  .safe-area-top {
+    padding-top: env(safe-area-inset-top, 0);
+  }
+
+  .touch-target {
+    @apply min-h-11 min-w-11;
+  }
+
+  .shell-header {
+    @apply flex h-14 shrink-0 items-center border-b px-4;
+  }
+
+  .animate-float {
+    animation: float 7s ease-in-out infinite;
+    will-change: transform;
+  }
+
+  .animate-float-delayed {
+    animation: float 9s ease-in-out infinite;
+    animation-delay: 1.5s;
+  }
+
+  .animate-pulse-glow {
+    animation: pulse-glow 3s ease-in-out infinite;
+  }
+
+  .animate-gradient-shift {
+    background-size: 200% 200%;
+    animation: gradient-shift 10s ease infinite;
+  }
+
+  .animate-spin-slow {
+    animation: spin 12s linear infinite;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-float,
+  .animate-float-delayed,
+  .animate-pulse-glow,
+  .animate-gradient-shift,
+  .animate-spin-slow {
+    animation: none;
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-12px);
+  }
+}
+
+@keyframes pulse-glow {
+  0%,
+  100% {
+    opacity: 0.45;
+  }
+
+  50% {
+    opacity: 0.85;
+  }
+}
+
+@keyframes gradient-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
+}
