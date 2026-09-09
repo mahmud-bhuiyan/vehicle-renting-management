@@ -1,6 +1,9 @@
 import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { provideRouter } from '@angular/router';
 import { provideNgIconsConfig } from '@ng-icons/core';
+import { apiResponseInterceptor } from './core/interceptors/api-response.interceptor';
+import { loadingInterceptor } from './core/interceptors/loading.interceptor';
 import { routes } from './app.routes';
 import { provideAppIcons } from './shared/icons/app-icons';
 
@@ -8,6 +11,7 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes),
+    provideHttpClient(withInterceptors([loadingInterceptor, apiResponseInterceptor])),
     provideNgIconsConfig({ size: '1.25rem' }),
     provideAppIcons(),
   ],
