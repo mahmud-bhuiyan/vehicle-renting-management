@@ -1,8 +1,54 @@
 import { HttpErrorResponse, HttpInterceptorFn, HttpResponse } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { catchError, map, throwError } from 'rxjs';
-import { ApiResponse } from '../models/api-response.model';
 import { ToastService } from '../services/toast.service';
+
+interface NormalizedApiResponse {
+  result: boolean;
+  data: unknown;
+  message?: string;
+}
+
+function normalizeApiResponse(body: unknown): NormalizedApiResponse | null {
+  if (!body || typeof body !== 'object') {
+    return null;
+  }
+
+  const record = body as Record<string, unknown>;
+  const result = record['Result'] ?? record['result'];
+
+  if (typeof result !== 'boolean') {
+    return null;
+  }
+
+  const data = record['Data'] ?? record['data'];
+  const message = record['Message'] ?? record['message'];
+
+  return {
+    result,
+    data,
+    message: typeof message === 'string' ? message : undefined,
+  };
+}
+
+function readErrorMessage(error: HttpErrorResponse): string {
+  const body = error.error;
+
+  if (body && typeof body === 'object') {
+    const normalized = normalizeApiResponse(body);
+    if (normalized?.message) {
+      return normalized.message;
+    }
+
+    const record = body as Record<string, unknown>;
+    const message = record['Message'] ?? record['message'];
+    if (typeof message === 'string' && message.length > 0) {
+      return message;
+    }
+  }
+
+  return error.message || 'Network request failed';
+}
 
 export const apiResponseInterceptor: HttpInterceptorFn = (req, next) => {
   const toastService = inject(ToastService);
@@ -13,25 +59,21 @@ export const apiResponseInterceptor: HttpInterceptorFn = (req, next) => {
         return event;
       }
 
-      const body = event.body as ApiResponse<unknown> | null;
+      const normalized = normalizeApiResponse(event.body);
 
-      if (!body || typeof body !== 'object' || !('Result' in body)) {
+      if (!normalized) {
         return event;
       }
 
-      if (!body.Result) {
-        throw new Error(body.Message ?? 'API request failed');
+      if (!normalized.result) {
+        throw new Error(normalized.message ?? 'API request failed');
       }
 
-      return event.clone({ body: body.Data });
+      return event.clone({ body: normalized.data });
     }),
     catchError((error: unknown) => {
       if (error instanceof HttpErrorResponse) {
-        const message =
-          (error.error as ApiResponse | null)?.Message ??
-          error.message ??
-          'Network request failed';
-
+        const message = readErrorMessage(error);
         toastService.error(message);
         return throwError(() => new Error(message));
       }

@@ -1,5 +1,6 @@
+/** Matches the JSON shape returned by CarRentalApp endpoints (camelCase). */
 export interface ApiResponse<T = unknown> {
-  Message?: string;
-  Result: boolean;
-  Data?: T;
+  message?: string;
+  result: boolean;
+  data?: T;
 }

@@ -1,10 +1,10 @@
 export interface RentCar {
-  CarId?: number;
-  Brand: string;
-  Model: string;
-  Year: number;
-  Color?: string;
-  DailyRate: number;
-  CarImage?: string;
-  RegNo: string;
+  carId?: number;
+  brand: string;
+  model: string;
+  year: number;
+  color?: string;
+  dailyRate: number;
+  carImage?: string;
+  regNo: string;
 }
