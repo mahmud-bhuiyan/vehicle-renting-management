@@ -35,6 +35,27 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/vehicles/vehicle-edit/vehicle-edit').then((m) => m.VehicleEditComponent),
       },
+      {
+        path: 'customer-ledger',
+        loadComponent: () =>
+          import('./features/customer-ledger/customer-ledger/customer-ledger').then(
+            (m) => m.CustomerLedgerComponent,
+          ),
+      },
+      {
+        path: 'customer-ledger/create',
+        loadComponent: () =>
+          import('./features/customer-ledger/customer-create/customer-create').then(
+            (m) => m.CustomerCreateComponent,
+          ),
+      },
+      {
+        path: 'customer-ledger/:id/edit',
+        loadComponent: () =>
+          import('./features/customer-ledger/customer-edit/customer-edit').then(
+            (m) => m.CustomerEditComponent,
+          ),
+      },
     ],
   },
   { path: '**', redirectTo: 'dashboard' },
