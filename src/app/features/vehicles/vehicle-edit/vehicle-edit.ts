@@ -68,6 +68,10 @@ export class VehicleEditComponent implements OnInit {
     this.carService.loadCars();
   }
 
+  protected reloadVehicle(): void {
+    this.carService.loadCars();
+  }
+
   protected onSubmit(payload: VehicleFormValue): void {
     const car = this.vehicle();
     if (!car?.carId) {

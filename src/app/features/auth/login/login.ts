@@ -56,6 +56,7 @@ export class LoginComponent {
 
     if (this.authService.login(username, password)) {
       this.isSubmitting.set(true);
+      this.toastService.success('Welcome back!');
       void this.router.navigate(['/dashboard']);
       return;
     }

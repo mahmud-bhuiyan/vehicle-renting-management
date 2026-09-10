@@ -3,6 +3,7 @@ import { computed, inject, Injectable, signal } from '@angular/core';
 import { finalize, map, Observable, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { RentCar } from '../models/rent-car.model';
+import { DashboardService } from './dashboard.service';
 
 function extractList<T>(body: unknown): T[] {
   if (Array.isArray(body)) {
@@ -24,6 +25,7 @@ function extractList<T>(body: unknown): T[] {
 @Injectable({ providedIn: 'root' })
 export class CarService {
   private readonly http = inject(HttpClient);
+  private readonly dashboardService = inject(DashboardService);
   private readonly baseUrl = environment.carRentalApi;
 
   private readonly carsCache = signal<RentCar[] | null>(null);
@@ -63,31 +65,23 @@ export class CarService {
     return this.carsCache()?.find((car) => car.carId === carId);
   }
 
-  getCars(): Observable<RentCar[]> {
-    return this.fetchCars();
-  }
-
-  getCarById(carId: number): Observable<RentCar | undefined> {
-    const cached = this.getCarFromCache(carId);
-    if (cached) {
-      return this.fetchCars().pipe(map((cars) => cars.find((car) => car.carId === carId) ?? cached));
-    }
-
-    return this.fetchCars().pipe(map((cars) => cars.find((car) => car.carId === carId)));
-  }
-
   createCar(car: RentCar): Observable<unknown> {
-    return this.http.post(`${this.baseUrl}/CreateNewCar`, car).pipe(tap(() => this.loadCars()));
+    return this.http.post(`${this.baseUrl}/CreateNewCar`, car).pipe(tap(() => this.afterFleetMutation()));
   }
 
   updateCar(car: RentCar): Observable<unknown> {
-    return this.http.put(`${this.baseUrl}/UpdateCar`, car).pipe(tap(() => this.loadCars()));
+    return this.http.put(`${this.baseUrl}/UpdateCar`, car).pipe(tap(() => this.afterFleetMutation()));
   }
 
   deleteCar(carId: number): Observable<unknown> {
     return this.http
       .delete(`${this.baseUrl}/DeleteCarbyCarId?carid=${carId}`)
-      .pipe(tap(() => this.loadCars()));
+      .pipe(tap(() => this.afterFleetMutation()));
+  }
+
+  private afterFleetMutation(): void {
+    this.loadCars();
+    this.dashboardService.loadDashboardData();
   }
 
   private fetchCars(): Observable<RentCar[]> {

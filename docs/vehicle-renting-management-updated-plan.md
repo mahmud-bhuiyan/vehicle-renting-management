@@ -329,6 +329,7 @@ src/
 │   │   │   └── loading.interceptor.ts
 │   │   ├── models/
 │   │   │   ├── api-response.model.ts
+│   │   │   ├── dashboard-data.model.ts
 │   │   │   ├── rent-car.model.ts
 │   │   │   ├── rent-customer.model.ts
 │   │   │   ├── rent-booking.model.ts
@@ -339,29 +340,34 @@ src/
 │   │       ├── customer.service.ts
 │   │       ├── booking.service.ts
 │   │       ├── dashboard.service.ts
-│   │       └── theme.service.ts   # light / dark user preference
+│   │       ├── theme.service.ts
+│   │       ├── toast.service.ts
+│   │       ├── loading.service.ts
+│   │       └── confirm-dialog.service.ts
 │   ├── layouts/
-│   │   └── admin-layout/          # sidebar + navbar shell for auth routes
+│   │   └── admin-layout/          # sidebar nav + top bar (integrated, no separate sidebar component)
 │   ├── shared/
 │   │   ├── components/
-│   │   │   ├── navbar/
-│   │   │   ├── sidebar/
+│   │   │   ├── data-table/        # reusable paginated table with search
+│   │   │   ├── empty-state/       # icon + message + optional CTA link
+│   │   │   ├── background-refresh/
+│   │   │   ├── submit-button/
 │   │   │   ├── loader/
-│   │   │   ├── theme-toggle/      # light / dark switch (ng-icons sun/moon)
+│   │   │   ├── theme-toggle/
 │   │   │   ├── confirm-dialog/
-│   │   │   └── toast/             # success / error feedback
-│   │   └── pipes/
+│   │   │   └── toast/
+│   │   └── icons/
+│   │       └── app-icons.ts
 │   ├── features/
-│   │   ├── auth/
-│   │   │   └── login/
+│   │   ├── auth/login/
 │   │   ├── dashboard/
-│   │   ├── vehicles/
-│   │   ├── book-vehicle/
-│   │   ├── bookings/
-│   │   └── customer-ledger/
+│   │   ├── vehicles/              # vehicle-list, vehicle-create, vehicle-edit, vehicle-form
+│   │   ├── book-vehicle/          # book-vehicle, book-vehicle-form
+│   │   ├── bookings/              # booking-list
+│   │   └── customer-ledger/       # customer-ledger, customer-create, customer-edit, customer-form
 │   ├── app.config.ts
 │   ├── app.routes.ts
-│   └── app.component.ts
+│   └── app.ts
 ├── environments/
 │   ├── environment.ts
 │   └── environment.prod.ts
@@ -579,14 +585,14 @@ export const environment = {
 |------|------|------|
 | 1.1 | Run `ng new vehicle-renting-management` (routing: Yes, Tailwind CSS: Yes, SSR: No, Cursor: optional) | [x] |
 | 1.2 | Verify Tailwind in `styles.css`; install ng-icons, register icons in `app.config.ts` | [x] |
-| 1.3 | Create `environment.ts` and `environment.prod.ts` with `apiBaseUrl` + `carRentalApi` | [ ] |
-| 1.4 | Create all TypeScript models in `core/models/` (`ApiResponse`, `RentCar`, `RentCustomer`, `RentBookingView`, `RentBookingFilter`) | [ ] |
-| 1.5 | Register `provideHttpClient(withInterceptors([apiResponseInterceptor, loadingInterceptor]))` in `app.config.ts` | [ ] |
-| 1.6 | Build `api-response.interceptor.ts` — unwrap `Data`, throw on `Result === false` | [ ] |
-| 1.7 | Build `loading.interceptor.ts` — toggle global loader via service | [ ] |
-| 1.8 | Create shared `LoaderComponent` and bind to loading service | [ ] |
-| 1.9 | Create `AdminLayoutComponent` with sidebar + navbar placeholders | [ ] |
-| 1.10 | Verify app runs at `http://localhost:4200` with layout shell visible | [ ] |
+| 1.3 | Create `environment.ts` and `environment.prod.ts` with `apiBaseUrl` + `carRentalApi` | [x] |
+| 1.4 | Create all TypeScript models in `core/models/` (`ApiResponse`, `RentCar`, `RentCustomer`, `RentBookingView`, `RentBookingFilter`) | [x] |
+| 1.5 | Register `provideHttpClient(withInterceptors([apiResponseInterceptor, loadingInterceptor]))` in `app.config.ts` | [x] |
+| 1.6 | Build `api-response.interceptor.ts` — unwrap `Data`, throw on `Result === false` | [x] |
+| 1.7 | Build `loading.interceptor.ts` — toggle global loader via service | [x] |
+| 1.8 | Create shared `LoaderComponent` and bind to loading service | [x] |
+| 1.9 | Create `AdminLayoutComponent` with sidebar + navbar placeholders | [x] |
+| 1.10 | Verify app runs at `http://localhost:4200` with layout shell visible | [x] |
 
 ---
 
@@ -594,14 +600,14 @@ export const environment = {
 
 | Step | Task | Done |
 |------|------|------|
-| 2.1 | Create `AuthService` — `login()`, `logout()`, `isLoggedIn()`, storage read/write | [ ] |
-| 2.2 | Create `authGuard` — block unauthenticated access to admin routes | [ ] |
-| 2.3 | Create `guestGuard` — redirect logged-in users away from `/login` | [ ] |
-| 2.4 | Build `LoginComponent` with reactive form (`username`, `password`) | [ ] |
-| 2.5 | Hard-code credentials check (`admin` / `admin123`); show error on failure | [ ] |
-| 2.6 | On success → save flag → navigate to `/dashboard` | [ ] |
-| 2.7 | Wire `app.routes.ts`: `/login` (guestGuard), admin layout children (authGuard), wildcards | [ ] |
-| 2.8 | Add logout button in navbar → clear storage → navigate to `/login` | [ ] |
+| 2.1 | Create `AuthService` — `login()`, `logout()`, `isLoggedIn()`, storage read/write | [x] |
+| 2.2 | Create `authGuard` — block unauthenticated access to admin routes | [x] |
+| 2.3 | Create `guestGuard` — redirect logged-in users away from `/login` | [x] |
+| 2.4 | Build `LoginComponent` with reactive form (`username`, `password`) | [x] |
+| 2.5 | Hard-code credentials check (`admin` / `admin123`); show error on failure | [x] |
+| 2.6 | On success → save flag → navigate to `/dashboard` | [x] |
+| 2.7 | Wire `app.routes.ts`: `/login` (guestGuard), admin layout children (authGuard), wildcards | [x] |
+| 2.8 | Add logout button in navbar → clear storage → navigate to `/login` | [x] |
 
 ---
 
@@ -609,15 +615,17 @@ export const environment = {
 
 | Step | Task | Done |
 |------|------|------|
-| 3.1 | Build `SidebarComponent` with nav links to all 5 feature routes | [ ] |
-| 3.2 | Build `ConfirmDialogComponent` (reusable delete confirmation) | [ ] |
-| 3.3 | Build `ToastComponent` + `ToastService` for success/error messages | [ ] |
-| 3.4 | Add empty-state template pattern (icon + message) for lists with no data | [ ] |
-| 3.5 | Create `ThemeService` — `light` / `dark`, `toggleTheme()`, `localStorage` persistence | [ ] |
-| 3.6 | Enable Tailwind dark mode on `<html>`; call `initTheme()` on app bootstrap (avoid flash) | [ ] |
-| 3.7 | Build `ThemeToggleComponent` (sun/moon ng-icons) in top bar or Admin menu | [ ] |
-| 3.8 | Add `dark:` variants to login, admin layout, dashboard, loader | [ ] |
-| 3.9 | Verify theme persists after refresh; both themes readable on mobile + desktop | [ ] |
+| 3.1 | Build `SidebarComponent` with nav links to all 5 feature routes | [x] |
+| 3.2 | Build `ConfirmDialogComponent` (reusable delete confirmation) | [x] |
+| 3.3 | Build `ToastComponent` + `ToastService` for success/error messages | [x] |
+| 3.4 | Add empty-state template pattern (icon + message) for lists with no data | [x] |
+| 3.5 | Create `ThemeService` — `light` / `dark`, `toggleTheme()`, `localStorage` persistence | [x] |
+| 3.6 | Enable Tailwind dark mode on `<html>`; call `initTheme()` on app bootstrap (avoid flash) | [x] |
+| 3.7 | Build `ThemeToggleComponent` (sun/moon ng-icons) in top bar or Admin menu | [x] |
+| 3.8 | Add `dark:` variants to login, admin layout, dashboard, loader | [x] |
+| 3.9 | Verify theme persists after refresh; both themes readable on mobile + desktop | [x] |
+
+> **Note (3.1):** Nav is built into `AdminLayoutComponent` (no separate `SidebarComponent` file). Also added reusable `DataTableComponent`, `BackgroundRefreshComponent`, and `SubmitButtonComponent` beyond the original plan.
 
 ---
 
@@ -625,14 +633,14 @@ export const environment = {
 
 | Step | Task | Done |
 |------|------|------|
-| 4.1 | Create `CarService` with `getCars`, `createCar`, `updateCar`, `deleteCar` | [ ] |
-| 4.2 | Lazy-load `/vehicles` route | [ ] |
-| 4.3 | Build vehicle list table — `GET GetCars`, loading + empty + error states | [ ] |
-| 4.4 | Build create form (reactive) with validation for required `RentCar` fields | [ ] |
-| 4.5 | Wire `POST CreateNewCar` — toast on success, refresh list | [ ] |
-| 4.6 | Add edit mode (inline or modal) — `PUT UpdateCar` | [ ] |
-| 4.7 | Add delete with confirm dialog — `DELETE DeleteCarbyCarId` | [ ] |
-| 4.8 | Use `@for` with `track car.CarId` on vehicle list | [ ] |
+| 4.1 | Create `CarService` with `loadCars`, `createCar`, `updateCar`, `deleteCar` | [x] |
+| 4.2 | Lazy-load `/vehicles` route (+ `/vehicles/create`, `/vehicles/:id/edit`) | [x] |
+| 4.3 | Build vehicle list table — `GET GetCars`, loading + empty + error states | [x] |
+| 4.4 | Build create form (reactive) with validation for required `RentCar` fields | [x] |
+| 4.5 | Wire `POST CreateNewCar` — toast on success, refresh list | [x] |
+| 4.6 | Add edit mode (dedicated page) — `PUT UpdateCar` | [x] |
+| 4.7 | Add delete with confirm dialog — `DELETE DeleteCarbyCarId` | [x] |
+| 4.8 | Use `@for` with `track car.carId` on vehicle list (via `DataTableComponent`) | [x] |
 
 ---
 
@@ -640,14 +648,14 @@ export const environment = {
 
 | Step | Task | Done |
 |------|------|------|
-| 5.1 | Create `CustomerService` with full CRUD + `getBookingsByCustomerId` | [ ] |
-| 5.2 | Lazy-load `/customer-ledger` route | [ ] |
-| 5.3 | Build customer list table — `GET GetCustomers` | [ ] |
-| 5.4 | On row expand → `GET geAllBookingsByCustomerId` — show booking history panel | [ ] |
-| 5.5 | Compute ledger columns: total bookings, total spend, last booking date | [ ] |
-| 5.6 | Add create customer form — `POST CreateNewCustomer` | [ ] |
-| 5.7 | Add edit customer — `PUT UpdateCustomer` | [ ] |
-| 5.8 | Add delete customer with confirm — `DELETE DeletCustomerById` | [ ] |
+| 5.1 | Create `CustomerService` with full CRUD + `loadBookingsByCustomerId` | [x] |
+| 5.2 | Lazy-load `/customer-ledger` route (+ create/edit child routes) | [x] |
+| 5.3 | Build customer list table — `GET GetCustomers` | [x] |
+| 5.4 | On row expand → `GET geAllBookingsByCustomerId` — show booking history panel | [x] |
+| 5.5 | Compute ledger columns: total bookings, total spend, last booking date | [x] |
+| 5.6 | Add create customer form — `POST CreateNewCustomer` | [x] |
+| 5.7 | Add edit customer — `PUT UpdateCustomer` | [x] |
+| 5.8 | Add delete customer with confirm — `DELETE DeletCustomerById` | [x] |
 
 ---
 
@@ -655,14 +663,14 @@ export const environment = {
 
 | Step | Task | Done |
 |------|------|------|
-| 6.1 | Create `BookingService` with `createBooking`, `getBookings`, `filterBookings`, `getBookingById`, `deleteBooking` | [ ] |
-| 6.2 | Lazy-load `/book-vehicle` route | [ ] |
-| 6.3 | Load cars + customers on init (`forkJoin` or parallel calls) | [ ] |
-| 6.4 | Build reactive form: customer fields, car select, booking date, rental days (UI), discount | [ ] |
-| 6.5 | Customer dropdown → pre-fill `CustomerName`, `Email`, `MobileNo`, `CustomerCity` | [ ] |
-| 6.6 | `computed()` bill: `(DailyRate × rentalDays) - Discount` → bind `TotalBillAmount` | [ ] |
-| 6.7 | Validate mobile (10 digits) and required API fields before submit | [ ] |
-| 6.8 | `POST CreateNewBooking` — toast on success → optional navigate to `/bookings` | [ ] |
+| 6.1 | Create `BookingService` with `createBooking`, `loadBookings`, `filterBookings`, `getBookingById`, `deleteBooking` | [x] |
+| 6.2 | Lazy-load `/book-vehicle` route | [x] |
+| 6.3 | Load cars + customers on init (parallel `loadCars` + `loadCustomers`) | [x] |
+| 6.4 | Build reactive form: customer fields, car select, booking date, rental days (UI), discount | [x] |
+| 6.5 | Customer dropdown → pre-fill `CustomerName`, `Email`, `MobileNo`, `CustomerCity` | [x] |
+| 6.6 | `computed()` bill: `(DailyRate × rentalDays) - Discount` → bind `TotalBillAmount` | [x] |
+| 6.7 | Validate mobile (10 digits) and required API fields before submit | [x] |
+| 6.8 | `POST CreateNewBooking` — toast on success → navigate to `/bookings` | [x] |
 
 ---
 
@@ -670,13 +678,13 @@ export const environment = {
 
 | Step | Task | Done |
 |------|------|------|
-| 7.1 | Lazy-load `/bookings` route | [ ] |
-| 7.2 | Load all bookings on init — `GET geAllBookings` | [ ] |
-| 7.3 | Build filter form (`RentBookingFilter`) — debounced `POST FilterBookings` | [ ] |
-| 7.4 | Add clear-filters button → reload all bookings | [ ] |
-| 7.5 | View detail — modal or `/bookings/:id` via `GET GetBookingByBookingId` | [ ] |
-| 7.6 | Delete booking with confirm — `DELETE DeletBookingById` → refresh list | [ ] |
-| 7.7 | Loading, empty, and error states on list + filter | [ ] |
+| 7.1 | Lazy-load `/bookings` route | [x] |
+| 7.2 | Load all bookings on init — `GET geAllBookings` | [x] |
+| 7.3 | Build filter form (`RentBookingFilter`) — debounced `POST FilterBookings` | [x] |
+| 7.4 | Add clear-filters button → reload all bookings | [x] |
+| 7.5 | View detail — modal via `GET GetBookingByBookingId` | [x] |
+| 7.6 | Delete booking with confirm — `DELETE DeletBookingById` → refresh list | [x] |
+| 7.7 | Loading, empty, and error states on list + filter | [x] |
 
 ---
 
@@ -684,11 +692,11 @@ export const environment = {
 
 | Step | Task | Done |
 |------|------|------|
-| 8.1 | Create `DashboardService` — `getDashboardData()` | [ ] |
-| 8.2 | Lazy-load `/dashboard` as default child route (`path: ''` redirect) | [ ] |
-| 8.3 | Call API; inspect response shape; bind summary cards | [ ] |
-| 8.4 | Add recent bookings table (if returned in `Data`) | [ ] |
-| 8.5 | Add skeleton loader while dashboard data loads | [ ] |
+| 8.1 | Create `DashboardService` — `loadDashboardData()` | [x] |
+| 8.2 | Lazy-load `/dashboard` as default child route (`path: ''` redirect) | [x] |
+| 8.3 | Call API; inspect response shape; bind summary cards | [x] |
+| 8.4 | Add recent bookings table (top 5 from `BookingService` — not in dashboard API) | [x] |
+| 8.5 | Add skeleton loader while dashboard data loads | [x] |
 
 ---
 
@@ -696,12 +704,14 @@ export const environment = {
 
 | Step | Task | Done |
 |------|------|------|
-| 9.1 | Ensure every screen has loading / empty / error UI | [ ] |
-| 9.2 | Toast on all CRUD success and failure paths | [ ] |
-| 9.3 | After new booking → invalidate or refresh dashboard/booking caches | [ ] |
-| 9.4 | Confirm dialog on every delete action (cars, customers, bookings) | [ ] |
-| 9.5 | Mobile-responsive sidebar (collapse on small screens) | [ ] |
-| 9.6 | Optional: `proxy.conf.json` if CORS blocks local dev API calls | [ ] |
+| 9.1 | Ensure every screen has loading / empty / error UI | [x] |
+| 9.2 | Toast on all CRUD success and failure paths | [x] |
+| 9.3 | After mutations → refresh dashboard/booking caches across services | [x] |
+| 9.4 | Confirm dialog on every delete action (cars, customers, bookings) | [x] |
+| 9.5 | Mobile-responsive sidebar (collapse on small screens) | [x] |
+| 9.6 | Optional: `proxy.conf.json` if CORS blocks local dev API calls | [—] |
+
+> **Note (9.6):** Skipped — API works directly from localhost without CORS issues. Add only if needed later.
 
 ---
 
@@ -709,12 +719,16 @@ export const environment = {
 
 | Step | Task | Done |
 |------|------|------|
-| 10.1 | `ChangeDetectionStrategy.OnPush` on all list/table components | [ ] |
-| 10.2 | `@for` with `track` on every list (no untracked loops) | [ ] |
-| 10.3 | `shareReplay(1)` cache on `getCars()` and `getCustomers()` in services | [ ] |
-| 10.4 | Replace manual subscriptions with `takeUntilDestroyed()` or signals | [ ] |
-| 10.5 | Run `ng build --stats-json` and review bundle size | [ ] |
-| 10.6 | Final pass: remove unused imports, console logs, dead code | [ ] |
+| 10.1 | `ChangeDetectionStrategy.OnPush` on all components (including root `App`) | [x] |
+| 10.2 | `@for` with `track` on every list (no untracked loops) | [x] |
+| 10.3 | `shareReplay(1)` cache on `getCars()` and `getCustomers()` in services | [—] |
+| 10.4 | Replace manual subscriptions with `takeUntilDestroyed()` or signals | [x] |
+| 10.5 | Run `ng build --stats-json` and review bundle size | [x] |
+| 10.6 | Final pass: remove unused imports, console logs, dead code | [x] |
+
+> **Note (10.3):** Skipped — signal-based service caches (`loadCars`, `loadCustomers`, `loadBookings`) used instead of RxJS `shareReplay(1)`.
+>
+> **Bundle (10.5):** Initial ~420 kB raw / ~99 kB transfer. All feature routes lazy-loaded. Stats at `dist/vehicle-renting-management/stats.json`.
 
 ---
 
@@ -838,8 +852,9 @@ export const environment = {
 | Real-time scenarios | ✅ Defined | Bill calculator, debounced filters, toasts |
 | Interview focus | ✅ Built in | 75 small steps map to Angular 22 concepts |
 | Tech stack | ✅ Aligned | Angular 22 + Tailwind CSS v4 + ng-icons |
-| User theme | ✅ Planned | Light / dark per user via `ThemeService` + `localStorage` (Phase 3.5–3.9) |
+| User theme | ✅ Done | `ThemeService` + `ThemeToggleComponent` + `localStorage` + `index.html` anti-FOUC script |
 | Symlink command | ⚠️ Optional | Use `node_modules` (no space) in path |
+| All 10 phases | ✅ Complete | 73/75 steps done; 2 optional steps skipped (9.6, 10.3) |
 
 ---
 
@@ -851,9 +866,27 @@ export const environment = {
 | Project created | ✅ Done (`ng new` with Tailwind CSS) |
 | Tailwind configured | ✅ Done (via `styles.css` + `.postcssrc.json`) |
 | ng-icons | ✅ Installed (`@ng-icons/core`, `@ng-icons/heroicons`) |
-| User theme (light / dark) | ⏳ Planned (Phase 3.5–3.9) |
-| Implementation | ⏳ In progress (Phases 1–2 + UI shell done) |
+| User theme (light / dark) | ✅ Done (Phase 3.5–3.9) |
+| Auth & routing | ✅ Done (Phase 2) |
+| Vehicles module | ✅ Done (Phase 4) |
+| Customer ledger | ✅ Done (Phase 5) |
+| Book vehicle | ✅ Done (Phase 6) |
+| Bookings listing | ✅ Done (Phase 7) |
+| Dashboard API | ✅ Done (Phase 8) |
+| Polish & UX | ✅ Done (Phase 9) |
+| Optimize | ✅ Done (Phase 10) |
+| **Implementation** | **✅ Complete** |
+
+### Optional / future enhancements (not in plan)
+
+| Item | Notes |
+|------|-------|
+| `proxy.conf.json` | Only if CORS blocks local dev (currently not needed) |
+| `shareReplay(1)` on services | Skipped; signal caches already in place |
+| `/bookings/:id` route | Modal used instead of dedicated detail route |
+| Booking update UI | API has no update-booking endpoint |
+| Chart library on dashboard | Optional per original plan |
 
 ---
 
-*Last updated: September 10, 2026 — user theme (light / dark) added to plan*
+*Last updated: September 11, 2026 — all 10 implementation phases complete*
