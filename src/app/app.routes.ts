@@ -63,6 +63,13 @@ export const routes: Routes = [
             (m) => m.BookVehicleComponent,
           ),
       },
+      {
+        path: 'bookings',
+        loadComponent: () =>
+          import('./features/bookings/booking-list/booking-list').then(
+            (m) => m.BookingListComponent,
+          ),
+      },
     ],
   },
   { path: '**', redirectTo: 'dashboard' },

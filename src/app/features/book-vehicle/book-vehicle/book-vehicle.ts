@@ -81,8 +81,8 @@ export class BookVehicleComponent implements OnInit {
         next: () => {
           this.toastService.success('Booking created successfully');
           this.isSubmitting.set(false);
-          this.customerService.loadCustomers();
           this.formComponent()?.resetForm();
+          void this.router.navigate(['/bookings']);
         },
         error: () => {
           this.isSubmitting.set(false);

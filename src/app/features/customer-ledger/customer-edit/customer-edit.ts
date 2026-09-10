@@ -70,6 +70,10 @@ export class CustomerEditComponent implements OnInit {
     this.customerService.loadCustomers();
   }
 
+  protected reloadCustomer(): void {
+    this.customerService.loadCustomers();
+  }
+
   protected onSubmit(payload: CustomerFormValue): void {
     const customer = this.customer();
     if (!customer?.customerId) {
