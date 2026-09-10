@@ -41,6 +41,7 @@ export class VehicleListComponent implements OnInit {
   protected readonly cars = signal<RentCar[]>([]);
   protected readonly isLoading = signal(true);
   protected readonly errorMessage = signal<string | null>(null);
+  protected readonly deletingCarId = signal<number | null>(null);
 
   protected readonly tableColumns: DataTableColumn<RentCar>[] = [
     {
@@ -84,7 +85,7 @@ export class VehicleListComponent implements OnInit {
   }
 
   protected async deleteCar(car: RentCar): Promise<void> {
-    if (!car.carId) {
+    if (!car.carId || this.deletingCarId() !== null) {
       return;
     }
 
@@ -99,14 +100,24 @@ export class VehicleListComponent implements OnInit {
       return;
     }
 
+    this.deletingCarId.set(car.carId);
+
     this.carService
       .deleteCar(car.carId)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
           this.toastService.success('Vehicle deleted successfully');
+          this.deletingCarId.set(null);
           this.loadCars();
         },
+        error: () => {
+          this.deletingCarId.set(null);
+        },
       });
+  }
+
+  protected isDeleting(car: RentCar): boolean {
+    return car.carId != null && this.deletingCarId() === car.carId;
   }
 }

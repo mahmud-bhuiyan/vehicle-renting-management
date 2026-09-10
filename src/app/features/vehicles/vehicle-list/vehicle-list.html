@@ -101,11 +101,16 @@
           </a>
           <button
             type="button"
-            class="inline-flex size-8 items-center justify-center rounded-lg text-slate-500 transition hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-500/10 dark:hover:text-rose-400"
+            class="inline-flex size-8 items-center justify-center rounded-lg text-slate-500 transition hover:bg-rose-50 hover:text-rose-600 disabled:cursor-not-allowed disabled:opacity-60 dark:hover:bg-rose-500/10 dark:hover:text-rose-400"
             aria-label="Delete vehicle"
+            [disabled]="isDeleting(car)"
             (click)="deleteCar(car)"
           >
-            <ng-icon name="heroTrash" class="size-5" />
+            @if (isDeleting(car)) {
+              <span class="size-4 animate-spin rounded-full border-2 border-rose-300 border-t-rose-600"></span>
+            } @else {
+              <ng-icon name="heroTrash" class="size-5" />
+            }
           </button>
         </div>
       </ng-template>

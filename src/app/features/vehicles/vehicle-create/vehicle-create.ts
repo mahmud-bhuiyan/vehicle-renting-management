@@ -21,6 +21,10 @@ export class VehicleCreateComponent {
   protected readonly isSubmitting = signal(false);
 
   protected onSubmit(payload: VehicleFormValue): void {
+    if (this.isSubmitting()) {
+      return;
+    }
+
     this.isSubmitting.set(true);
 
     this.carService

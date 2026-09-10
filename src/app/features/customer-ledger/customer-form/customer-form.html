@@ -153,21 +153,18 @@
       >
         <button
           type="button"
-          class="inline-flex min-h-11 items-center justify-center rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 dark:border-white/10 dark:bg-surface-800 dark:text-slate-200 dark:hover:bg-white/5"
+          class="inline-flex min-h-11 items-center justify-center rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60 dark:border-white/10 dark:bg-surface-800 dark:text-slate-200 dark:hover:bg-white/5"
+          [disabled]="isSubmitting()"
           (click)="onCancel()"
         >
           Cancel
         </button>
-        <button
-          type="submit"
-          class="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-linear-to-r from-violet-600 to-fuchsia-600 px-5 py-2.5 text-sm font-semibold text-white shadow-md shadow-violet-500/30 transition hover:from-violet-700 hover:to-fuchsia-700 disabled:cursor-not-allowed disabled:opacity-60"
-          [disabled]="isSubmitting()"
+        <app-submit-button
+          [loading]="isSubmitting()"
+          classes="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-linear-to-r from-violet-600 to-fuchsia-600 px-5 py-2.5 text-sm font-semibold text-white shadow-md shadow-violet-500/30 transition hover:from-violet-700 hover:to-fuchsia-700 disabled:cursor-not-allowed disabled:opacity-60"
         >
-          @if (isSubmitting()) {
-            <span class="size-4 animate-spin rounded-full border-2 border-white/30 border-t-white"></span>
-          }
           {{ submitLabel() }}
-        </button>
+        </app-submit-button>
       </div>
     </form>
   </div>

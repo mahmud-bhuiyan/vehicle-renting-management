@@ -143,15 +143,13 @@
               </div>
             }
 
-            <button
-              type="submit"
-              class="touch-target group relative w-full overflow-hidden rounded-xl bg-linear-to-r from-indigo-500 via-violet-500 to-cyan-500 px-4 py-3.5 text-base font-semibold text-white shadow-lg shadow-indigo-500/30 transition hover:shadow-indigo-500/50 active:scale-[0.98] sm:hover:scale-[1.02]"
+            <app-submit-button
+              [loading]="isSubmitting()"
+              classes="touch-target group relative w-full overflow-hidden rounded-xl bg-linear-to-r from-indigo-500 via-violet-500 to-cyan-500 px-4 py-3.5 text-base font-semibold text-white shadow-lg shadow-indigo-500/30 transition hover:shadow-indigo-500/50 active:scale-[0.98] disabled:scale-100 sm:hover:scale-[1.02]"
             >
-              <span class="relative z-10 inline-flex items-center justify-center gap-2">
-                <ng-icon name="heroRocketLaunch" class="size-5" />
-                Launch dashboard
-              </span>
-            </button>
+              <ng-icon name="heroRocketLaunch" class="size-5" />
+              Launch dashboard
+            </app-submit-button>
           </form>
         </div>
       </div>

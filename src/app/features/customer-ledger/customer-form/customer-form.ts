@@ -12,13 +12,14 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { NgIcon } from '@ng-icons/core';
 import { startWith } from 'rxjs';
 import { RentCustomer } from '../../../core/models/rent-customer.model';
+import { SubmitButtonComponent } from '../../../shared/components/submit-button/submit-button';
 
 export type CustomerFormValue = Omit<RentCustomer, 'customerId'>;
 
 @Component({
   selector: 'app-customer-form',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ReactiveFormsModule, NgIcon],
+  imports: [ReactiveFormsModule, NgIcon, SubmitButtonComponent],
   templateUrl: './customer-form.html',
 })
 export class CustomerFormComponent {
@@ -61,6 +62,10 @@ export class CustomerFormComponent {
   }
 
   protected onSubmit(): void {
+    if (this.isSubmitting()) {
+      return;
+    }
+
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;

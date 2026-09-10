@@ -68,6 +68,7 @@ export class CustomerLedgerComponent implements OnInit {
   protected readonly summaryCache = signal<Record<number, CustomerLedgerSummary>>({});
   protected readonly loadingBookingsFor = signal<number | null>(null);
   protected readonly bookingErrors = signal<Record<number, string>>({});
+  protected readonly deletingCustomerId = signal<number | null>(null);
 
   protected readonly filteredCustomers = computed(() => {
     const query = this.searchQuery().trim().toLowerCase();
@@ -204,7 +205,7 @@ export class CustomerLedgerComponent implements OnInit {
   }
 
   protected async deleteCustomer(customer: RentCustomer): Promise<void> {
-    if (!customer.customerId) {
+    if (!customer.customerId || this.deletingCustomerId() !== null) {
       return;
     }
 
@@ -219,6 +220,8 @@ export class CustomerLedgerComponent implements OnInit {
       return;
     }
 
+    this.deletingCustomerId.set(customer.customerId);
+
     this.customerService
       .deleteCustomer(customer.customerId)
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -228,8 +231,16 @@ export class CustomerLedgerComponent implements OnInit {
           if (this.expandedCustomerId() === customer.customerId) {
             this.expandedCustomerId.set(null);
           }
+          this.deletingCustomerId.set(null);
           this.loadCustomers();
         },
+        error: () => {
+          this.deletingCustomerId.set(null);
+        },
       });
+  }
+
+  protected isDeleting(customer: RentCustomer): boolean {
+    return customer.customerId != null && this.deletingCustomerId() === customer.customerId;
   }
 }

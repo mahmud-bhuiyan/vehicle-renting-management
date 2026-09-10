@@ -66,6 +66,10 @@ export class CustomerEditComponent implements OnInit {
       return;
     }
 
+    if (this.isSubmitting()) {
+      return;
+    }
+
     this.isSubmitting.set(true);
 
     this.customerService

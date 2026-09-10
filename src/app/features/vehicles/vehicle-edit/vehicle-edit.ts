@@ -66,6 +66,10 @@ export class VehicleEditComponent implements OnInit {
       return;
     }
 
+    if (this.isSubmitting()) {
+      return;
+    }
+
     this.isSubmitting.set(true);
 
     this.carService
