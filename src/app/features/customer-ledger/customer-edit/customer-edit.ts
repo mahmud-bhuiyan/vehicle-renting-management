@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  computed,
   DestroyRef,
   inject,
   OnInit,
@@ -9,60 +10,73 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { NgIcon } from '@ng-icons/core';
-import { RentCustomer } from '../../../core/models/rent-customer.model';
 import { CustomerService } from '../../../core/services/customer.service';
 import { ToastService } from '../../../core/services/toast.service';
+import { BackgroundRefreshComponent } from '../../../shared/components/background-refresh/background-refresh';
 import { CustomerFormComponent, CustomerFormValue } from '../customer-form/customer-form';
 
 @Component({
   selector: 'app-customer-edit',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, NgIcon, CustomerFormComponent],
+  imports: [RouterLink, NgIcon, CustomerFormComponent, BackgroundRefreshComponent],
   templateUrl: './customer-edit.html',
 })
 export class CustomerEditComponent implements OnInit {
-  private readonly customerService = inject(CustomerService);
+  protected readonly customerService = inject(CustomerService);
   private readonly toastService = inject(ToastService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly destroyRef = inject(DestroyRef);
 
-  protected readonly isLoading = signal(true);
+  private readonly customerId = Number(this.route.snapshot.paramMap.get('id'));
+
   protected readonly isSubmitting = signal(false);
-  protected readonly errorMessage = signal<string | null>(null);
-  protected readonly customer = signal<RentCustomer | null>(null);
+
+  protected readonly customer = computed(() => {
+    if (!this.customerId || Number.isNaN(this.customerId)) {
+      return null;
+    }
+
+    return (
+      this.customerService.customers().find((item) => item.customerId === this.customerId) ?? null
+    );
+  });
+
+  protected readonly isInitialLoading = computed(() => {
+    if (!this.customerId || Number.isNaN(this.customerId)) {
+      return false;
+    }
+
+    return !this.customerService.hasCustomers() && this.customerService.isInitialLoading();
+  });
+
+  protected readonly errorMessage = computed(() => {
+    if (!this.customerId || Number.isNaN(this.customerId)) {
+      return 'Invalid customer ID';
+    }
+
+    if (this.customerService.hasCustomers() && !this.customer()) {
+      return 'Customer not found';
+    }
+
+    return this.customerService.loadError();
+  });
 
   ngOnInit(): void {
-    const customerId = Number(this.route.snapshot.paramMap.get('id'));
-
-    if (!customerId || Number.isNaN(customerId)) {
-      this.errorMessage.set('Invalid customer ID');
-      this.isLoading.set(false);
+    if (!this.customerId || Number.isNaN(this.customerId)) {
       return;
     }
 
-    this.customerService
-      .getCustomerById(customerId)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (found) => {
-          if (!found) {
-            this.errorMessage.set('Customer not found');
-          } else {
-            this.customer.set(found);
-          }
-          this.isLoading.set(false);
-        },
-        error: (error: Error) => {
-          this.errorMessage.set(error.message);
-          this.isLoading.set(false);
-        },
-      });
+    this.customerService.loadCustomers();
   }
 
   protected onSubmit(payload: CustomerFormValue): void {
     const customer = this.customer();
     if (!customer?.customerId) {
+      return;
+    }
+
+    if (this.isSubmitting()) {
       return;
     }
 

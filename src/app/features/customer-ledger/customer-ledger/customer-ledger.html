@@ -9,16 +9,19 @@
       </p>
     </div>
 
-    <a
-      routerLink="/customer-ledger/create"
-      class="inline-flex min-h-10 shrink-0 items-center justify-center gap-2 rounded-xl bg-linear-to-r from-violet-600 to-fuchsia-600 px-4 py-2 text-sm font-semibold text-white shadow-md shadow-violet-500/30 transition hover:from-violet-700 hover:to-fuchsia-700"
-    >
-      <ng-icon name="heroPlus" class="size-5" />
-      Add customer
-    </a>
+    <div class="flex shrink-0 items-center gap-2">
+      <app-background-refresh [visible]="customerService.isRefreshing()" />
+      <a
+        routerLink="/customer-ledger/create"
+        class="inline-flex min-h-10 items-center justify-center gap-2 rounded-xl bg-linear-to-r from-violet-600 to-fuchsia-600 px-4 py-2 text-sm font-semibold text-white shadow-md shadow-violet-500/30 transition hover:from-violet-700 hover:to-fuchsia-700"
+      >
+        <ng-icon name="heroPlus" class="size-5" />
+        Add customer
+      </a>
+    </div>
   </section>
 
-  @if (isLoading()) {
+  @if (customerService.isInitialLoading()) {
     <div
       class="overflow-hidden rounded-2xl border border-white/80 bg-white shadow-lg shadow-slate-200/60 dark:border-white/10 dark:bg-surface-900 dark:shadow-black/20"
     >
@@ -28,7 +31,7 @@
         }
       </div>
     </div>
-  } @else if (errorMessage(); as error) {
+  } @else if (customerService.loadError(); as error) {
     <div
       class="flex flex-col gap-3 rounded-2xl border border-rose-200 bg-rose-50 p-4 sm:flex-row sm:items-center sm:justify-between dark:border-rose-500/30 dark:bg-rose-500/10"
     >
@@ -42,12 +45,12 @@
       <button
         type="button"
         class="inline-flex min-h-9 shrink-0 items-center justify-center rounded-lg border border-rose-300 bg-white px-3 py-1.5 text-sm font-semibold text-rose-700 transition hover:bg-rose-100 dark:border-rose-500/30 dark:bg-transparent dark:text-rose-300 dark:hover:bg-rose-500/10"
-        (click)="loadCustomers()"
+        (click)="reloadCustomers()"
       >
         Retry
       </button>
     </div>
-  } @else if (customers().length === 0) {
+  } @else if (customerService.customers().length === 0) {
     <app-empty-state
       icon="heroUsers"
       title="No customers yet"
@@ -205,11 +208,16 @@
                     </a>
                     <button
                       type="button"
-                      class="inline-flex size-8 items-center justify-center rounded-lg text-slate-500 transition hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-500/10 dark:hover:text-rose-400"
+                      class="inline-flex size-8 items-center justify-center rounded-lg text-slate-500 transition hover:bg-rose-50 hover:text-rose-600 disabled:cursor-not-allowed disabled:opacity-60 dark:hover:bg-rose-500/10 dark:hover:text-rose-400"
                       aria-label="Delete customer"
+                      [disabled]="isDeleting(customer)"
                       (click)="deleteCustomer(customer)"
                     >
-                      <ng-icon name="heroTrash" class="size-5" />
+                      @if (isDeleting(customer)) {
+                        <span class="size-4 animate-spin rounded-full border-2 border-rose-300 border-t-rose-600"></span>
+                      } @else {
+                        <ng-icon name="heroTrash" class="size-5" />
+                      }
                     </button>
                   </div>
                 </td>
@@ -243,12 +251,12 @@
                         <button
                           type="button"
                           class="inline-flex min-h-9 shrink-0 items-center justify-center rounded-lg border border-rose-300 bg-white px-3 py-1.5 text-sm font-semibold text-rose-700 transition hover:bg-rose-100 dark:border-rose-500/30 dark:bg-transparent dark:text-rose-300 dark:hover:bg-rose-500/10"
-                          (click)="loadBookings(customer.customerId!)"
+                          (click)="reloadBookings(customer.customerId!)"
                         >
                           Retry
                         </button>
                       </div>
-                    } @else if (bookingsFor(customer.customerId).length === 0) {
+                    } @else if (hasBookingsCache(customer.customerId) && bookingsFor(customer.customerId).length === 0) {
                       <div
                         class="rounded-xl border border-dashed border-slate-200 px-4 py-8 text-center dark:border-white/10"
                       >
@@ -262,6 +270,7 @@
                       </div>
                     } @else {
                       <div class="space-y-4">
+                        <app-background-refresh [visible]="isRefreshingBookings(customer.customerId)" />
                         @if (summaryFor(customer.customerId); as summary) {
                           <div class="grid gap-3 sm:grid-cols-3">
                             <div

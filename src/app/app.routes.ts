@@ -56,6 +56,13 @@ export const routes: Routes = [
             (m) => m.CustomerEditComponent,
           ),
       },
+      {
+        path: 'book-vehicle',
+        loadComponent: () =>
+          import('./features/book-vehicle/book-vehicle/book-vehicle').then(
+            (m) => m.BookVehicleComponent,
+          ),
+      },
     ],
   },
   { path: '**', redirectTo: 'dashboard' },

@@ -1,0 +1,331 @@
+<div
+  class="overflow-hidden rounded-2xl border border-white/80 bg-white shadow-lg shadow-slate-200/60 dark:border-white/10 dark:bg-surface-900 dark:shadow-black/20 lg:rounded-3xl"
+>
+  <div class="grid lg:grid-cols-[minmax(0,320px)_1fr]">
+    <aside
+      class="relative overflow-hidden border-b border-slate-100 bg-linear-to-br from-cyan-600 via-blue-600 to-indigo-600 p-5 dark:border-white/10 sm:p-6 lg:border-b-0 lg:border-r"
+    >
+      <div
+        class="pointer-events-none absolute -right-8 -top-8 size-32 rounded-full bg-white/10 blur-2xl"
+      ></div>
+
+      <div class="relative z-10">
+        <div
+          class="inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-xs font-semibold text-white backdrop-blur-md"
+        >
+          <ng-icon name="heroBanknotes" class="size-3.5" />
+          Bill preview
+        </div>
+
+        <div class="mt-5 space-y-4 rounded-2xl border border-white/20 bg-black/20 p-5 shadow-xl backdrop-blur-sm">
+          <div class="space-y-1 text-center">
+            <p class="text-lg font-bold text-white">{{ previewCustomer().name }}</p>
+            <p class="text-sm text-cyan-100">{{ previewCustomer().subtitle }}</p>
+          </div>
+
+          @if (selectedCar(); as car) {
+            <div class="flex items-center gap-3 rounded-xl bg-white/10 px-3 py-2.5">
+              <div
+                class="flex size-10 shrink-0 items-center justify-center rounded-lg bg-white/15 text-white"
+              >
+                <ng-icon name="heroTruck" class="size-5" />
+              </div>
+              <div class="min-w-0 text-left">
+                <p class="truncate text-sm font-semibold text-white">{{ car.brand }} {{ car.model }}</p>
+                <p class="text-xs text-cyan-100">{{ car.regNo }} · {{ car.dailyRate | currency }}/day</p>
+              </div>
+            </div>
+          } @else {
+            <div
+              class="flex items-center justify-center gap-2 rounded-xl bg-white/10 px-3 py-6 text-sm text-cyan-100"
+            >
+              <ng-icon name="heroTruck" class="size-5" />
+              Select a vehicle to preview the bill
+            </div>
+          }
+
+          <div class="space-y-2 rounded-xl bg-white/10 p-3 text-sm">
+            <div class="flex items-center justify-between text-cyan-100">
+              <span>Daily rate × days</span>
+              <span class="font-medium text-white">
+                @if (selectedCar(); as car) {
+                  {{ car.dailyRate | currency }} × {{ formValue().rentalDays }}
+                } @else {
+                  —
+                }
+              </span>
+            </div>
+            <div class="flex items-center justify-between text-cyan-100">
+              <span>Subtotal</span>
+              <span class="font-medium text-white">{{ subtotal() | currency }}</span>
+            </div>
+            <div class="flex items-center justify-between text-cyan-100">
+              <span>Discount</span>
+              <span class="font-medium text-white">−{{ (formValue().discount ?? 0) | currency }}</span>
+            </div>
+            <div class="border-t border-white/15 pt-2">
+              <div class="flex items-center justify-between">
+                <span class="text-sm font-semibold text-white">Total bill</span>
+                <span class="text-xl font-bold text-white">{{ totalBillAmount() | currency }}</span>
+              </div>
+            </div>
+          </div>
+
+          @if (formValue().bookingDate) {
+            <div class="flex items-center gap-2 rounded-xl bg-white/10 px-3 py-2 text-xs text-cyan-100">
+              <ng-icon name="heroCalendarDays" class="size-4 shrink-0" />
+              <span>
+                Booking:
+                {{ formValue().bookingDate | date: 'medium' }}
+              </span>
+            </div>
+          }
+        </div>
+
+        <p class="mt-4 text-xs leading-relaxed text-cyan-100/90">
+          Total updates live as you change vehicle, rental days, or discount.
+        </p>
+      </div>
+    </aside>
+
+    <form class="flex min-w-0 flex-col" [formGroup]="form" (ngSubmit)="onSubmit()">
+      <div class="flex-1 space-y-8 p-5 sm:p-6 lg:p-8">
+        <section class="space-y-4">
+          <div class="flex items-center gap-3">
+            <div
+              class="flex size-9 shrink-0 items-center justify-center rounded-xl bg-cyan-100 text-cyan-600 dark:bg-cyan-500/15 dark:text-cyan-300"
+            >
+              <ng-icon name="heroUsers" class="size-5" />
+            </div>
+            <div>
+              <h3 class="text-sm font-bold text-slate-900 dark:text-slate-100">Customer</h3>
+              <p class="text-xs text-slate-500 dark:text-slate-400">Pick existing or enter manually</p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div class="sm:col-span-2">
+              <label
+                class="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300"
+                for="customerSelect"
+              >
+                Existing customer (optional)
+              </label>
+              <select
+                id="customerSelect"
+                formControlName="customerSelect"
+                class="block w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-900 transition focus:border-cyan-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-cyan-500/20 dark:border-white/10 dark:bg-surface-800 dark:text-slate-100 dark:focus:bg-surface-800"
+                (change)="onCustomerSelectChange($event)"
+              >
+                <option value="">Enter customer manually</option>
+                @for (customer of customers(); track customer.customerId) {
+                  <option [value]="customer.customerId">
+                    {{ customer.customerName }}
+                    @if (customer.mobileNo) {
+                      · {{ customer.mobileNo }}
+                    }
+                  </option>
+                }
+              </select>
+            </div>
+
+            <div class="sm:col-span-2">
+              <label
+                class="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300"
+                for="customerName"
+              >
+                Customer name
+              </label>
+              <input
+                id="customerName"
+                type="text"
+                formControlName="customerName"
+                placeholder="e.g. Jane Cooper"
+                class="block w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-900 transition placeholder:text-slate-400 focus:border-cyan-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-cyan-500/20 dark:border-white/10 dark:bg-surface-800 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:bg-surface-800"
+                [class.border-rose-500]="fieldError('customerName')"
+              />
+              @if (fieldError('customerName'); as err) {
+                <p class="mt-1.5 text-xs text-rose-600 dark:text-rose-400">{{ err }}</p>
+              }
+            </div>
+
+            <div>
+              <label
+                class="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300"
+                for="customerCity"
+              >
+                City
+              </label>
+              <input
+                id="customerCity"
+                type="text"
+                formControlName="customerCity"
+                placeholder="e.g. Austin"
+                class="block w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-900 transition placeholder:text-slate-400 focus:border-cyan-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-cyan-500/20 dark:border-white/10 dark:bg-surface-800 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:bg-surface-800"
+              />
+            </div>
+
+            <div>
+              <label
+                class="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300"
+                for="mobileNo"
+              >
+                Mobile no
+              </label>
+              <input
+                id="mobileNo"
+                type="tel"
+                formControlName="mobileNo"
+                placeholder="10-digit mobile"
+                class="block w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-900 transition placeholder:text-slate-400 focus:border-cyan-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-cyan-500/20 dark:border-white/10 dark:bg-surface-800 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:bg-surface-800"
+                [class.border-rose-500]="fieldError('mobileNo')"
+              />
+              @if (fieldError('mobileNo'); as err) {
+                <p class="mt-1.5 text-xs text-rose-600 dark:text-rose-400">{{ err }}</p>
+              }
+            </div>
+
+            <div class="sm:col-span-2">
+              <label
+                class="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300"
+                for="email"
+              >
+                Email
+              </label>
+              <input
+                id="email"
+                type="email"
+                formControlName="email"
+                placeholder="e.g. jane@example.com"
+                class="block w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-900 transition placeholder:text-slate-400 focus:border-cyan-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-cyan-500/20 dark:border-white/10 dark:bg-surface-800 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:bg-surface-800"
+                [class.border-rose-500]="fieldError('email')"
+              />
+              @if (fieldError('email'); as err) {
+                <p class="mt-1.5 text-xs text-rose-600 dark:text-rose-400">{{ err }}</p>
+              }
+            </div>
+          </div>
+        </section>
+
+        <section class="space-y-4">
+          <div class="flex items-center gap-3">
+            <div
+              class="flex size-9 shrink-0 items-center justify-center rounded-xl bg-indigo-100 text-indigo-600 dark:bg-indigo-500/15 dark:text-indigo-300"
+            >
+              <ng-icon name="heroClipboardDocumentList" class="size-5" />
+            </div>
+            <div>
+              <h3 class="text-sm font-bold text-slate-900 dark:text-slate-100">Booking details</h3>
+              <p class="text-xs text-slate-500 dark:text-slate-400">Vehicle, dates, and pricing</p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div class="sm:col-span-2">
+              <label
+                class="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300"
+                for="carId"
+              >
+                Vehicle
+              </label>
+              <select
+                id="carId"
+                formControlName="carId"
+                class="block w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-900 transition focus:border-cyan-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-cyan-500/20 dark:border-white/10 dark:bg-surface-800 dark:text-slate-100 dark:focus:bg-surface-800"
+                [class.border-rose-500]="fieldError('carId')"
+              >
+                <option [value]="0" disabled>Select a vehicle</option>
+                @for (car of cars(); track car.carId) {
+                  <option [value]="car.carId">{{ carLabel(car) }}</option>
+                }
+              </select>
+              @if (fieldError('carId'); as err) {
+                <p class="mt-1.5 text-xs text-rose-600 dark:text-rose-400">{{ err }}</p>
+              }
+            </div>
+
+            <div>
+              <label
+                class="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300"
+                for="bookingDate"
+              >
+                Booking date
+              </label>
+              <input
+                id="bookingDate"
+                type="datetime-local"
+                formControlName="bookingDate"
+                class="block w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-900 transition focus:border-cyan-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-cyan-500/20 dark:border-white/10 dark:bg-surface-800 dark:text-slate-100 dark:focus:bg-surface-800"
+                [class.border-rose-500]="fieldError('bookingDate')"
+              />
+              @if (fieldError('bookingDate'); as err) {
+                <p class="mt-1.5 text-xs text-rose-600 dark:text-rose-400">{{ err }}</p>
+              }
+            </div>
+
+            <div>
+              <label
+                class="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300"
+                for="rentalDays"
+              >
+                Rental days
+              </label>
+              <input
+                id="rentalDays"
+                type="number"
+                min="1"
+                formControlName="rentalDays"
+                class="block w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-900 transition focus:border-cyan-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-cyan-500/20 dark:border-white/10 dark:bg-surface-800 dark:text-slate-100 dark:focus:bg-surface-800"
+                [class.border-rose-500]="fieldError('rentalDays')"
+              />
+              @if (fieldError('rentalDays'); as err) {
+                <p class="mt-1.5 text-xs text-rose-600 dark:text-rose-400">{{ err }}</p>
+              }
+              <p class="mt-1.5 text-xs text-slate-500 dark:text-slate-400">Used for bill calculation only</p>
+            </div>
+
+            <div>
+              <label
+                class="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300"
+                for="discount"
+              >
+                Discount
+              </label>
+              <input
+                id="discount"
+                type="number"
+                min="0"
+                step="1"
+                formControlName="discount"
+                class="block w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-900 transition focus:border-cyan-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-cyan-500/20 dark:border-white/10 dark:bg-surface-800 dark:text-slate-100 dark:focus:bg-surface-800"
+                [class.border-rose-500]="fieldError('discount')"
+              />
+              @if (fieldError('discount'); as err) {
+                <p class="mt-1.5 text-xs text-rose-600 dark:text-rose-400">{{ err }}</p>
+              }
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <div
+        class="flex flex-col-reverse gap-3 border-t border-slate-100 bg-slate-50/80 px-5 py-4 dark:border-white/10 dark:bg-white/2 sm:flex-row sm:justify-end sm:px-6 lg:px-8"
+      >
+        <button
+          type="button"
+          class="inline-flex min-h-11 items-center justify-center rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60 dark:border-white/10 dark:bg-surface-800 dark:text-slate-200 dark:hover:bg-white/5"
+          [disabled]="isSubmitting()"
+          (click)="onCancel()"
+        >
+          Cancel
+        </button>
+        <app-submit-button
+          [loading]="isSubmitting()"
+          classes="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-linear-to-r from-cyan-600 to-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-md shadow-cyan-500/30 transition hover:from-cyan-700 hover:to-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          {{ submitLabel() }}
+        </app-submit-button>
+      </div>
+    </form>
+  </div>
+</div>

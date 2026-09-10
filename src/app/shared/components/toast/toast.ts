@@ -8,7 +8,7 @@ import { ToastService } from '../../../core/services/toast.service';
   imports: [NgIcon],
   template: `
     <div
-      class="pointer-events-none fixed inset-x-0 top-4 z-60 flex flex-col items-center gap-2 px-4 safe-area-top"
+      class="pointer-events-none fixed bottom-4 right-4 z-60 flex max-w-[calc(100vw-2rem)] flex-col-reverse items-end gap-2 safe-area-bottom"
       aria-live="polite"
     >
       @for (toast of toastService.toasts(); track toast.id) {

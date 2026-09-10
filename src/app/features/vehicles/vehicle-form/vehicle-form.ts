@@ -13,13 +13,14 @@ import { CurrencyPipe } from '@angular/common';
 import { NgIcon } from '@ng-icons/core';
 import { startWith } from 'rxjs';
 import { RentCar } from '../../../core/models/rent-car.model';
+import { SubmitButtonComponent } from '../../../shared/components/submit-button/submit-button';
 
 export type VehicleFormValue = Omit<RentCar, 'carId'>;
 
 @Component({
   selector: 'app-vehicle-form',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ReactiveFormsModule, NgIcon, CurrencyPipe],
+  imports: [ReactiveFormsModule, NgIcon, CurrencyPipe, SubmitButtonComponent],
   templateUrl: './vehicle-form.html',
 })
 export class VehicleFormComponent {
@@ -71,6 +72,10 @@ export class VehicleFormComponent {
   }
 
   protected onSubmit(): void {
+    if (this.isSubmitting()) {
+      return;
+    }
+
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;

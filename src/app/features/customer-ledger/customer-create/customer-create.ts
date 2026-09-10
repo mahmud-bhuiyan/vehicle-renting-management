@@ -21,6 +21,10 @@ export class CustomerCreateComponent {
   protected readonly isSubmitting = signal(false);
 
   protected onSubmit(payload: CustomerFormValue): void {
+    if (this.isSubmitting()) {
+      return;
+    }
+
     this.isSubmitting.set(true);
 
     this.customerService

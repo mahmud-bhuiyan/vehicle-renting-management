@@ -23,9 +23,11 @@
         </div>
       </div>
     </div>
+
+    <app-background-refresh [visible]="customerService.isRefreshing()" />
   </section>
 
-  @if (isLoading()) {
+  @if (isInitialLoading()) {
     <div
       class="overflow-hidden rounded-2xl border border-white/80 bg-white shadow-lg shadow-slate-200/60 dark:border-white/10 dark:bg-surface-900 dark:shadow-black/20"
     >
