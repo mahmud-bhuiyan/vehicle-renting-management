@@ -24,17 +24,20 @@
       </div>
     </div>
 
-    @if (vehicle(); as car) {
-      <span
-        class="inline-flex w-fit shrink-0 items-center gap-2 rounded-full border border-violet-200 bg-violet-50 px-3 py-1 text-xs font-semibold text-violet-700 dark:border-violet-500/30 dark:bg-violet-500/10 dark:text-violet-300"
-      >
-        <ng-icon name="heroTruck" class="size-3.5" />
-        {{ car.brand }} {{ car.model }}
-      </span>
-    }
+    <div class="flex shrink-0 items-center gap-2">
+      <app-background-refresh [visible]="carService.isRefreshing()" />
+      @if (vehicle(); as car) {
+        <span
+          class="inline-flex w-fit items-center gap-2 rounded-full border border-violet-200 bg-violet-50 px-3 py-1 text-xs font-semibold text-violet-700 dark:border-violet-500/30 dark:bg-violet-500/10 dark:text-violet-300"
+        >
+          <ng-icon name="heroTruck" class="size-3.5" />
+          {{ car.brand }} {{ car.model }}
+        </span>
+      }
+    </div>
   </section>
 
-  @if (isLoading()) {
+  @if (isInitialLoading()) {
     <div
       class="overflow-hidden rounded-2xl border border-white/80 bg-white shadow-lg shadow-slate-200/60 dark:border-white/10 dark:bg-surface-900 dark:shadow-black/20 lg:rounded-3xl"
     >

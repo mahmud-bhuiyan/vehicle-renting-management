@@ -14,6 +14,7 @@ import { RentCar } from '../../../core/models/rent-car.model';
 import { CarService } from '../../../core/services/car.service';
 import { ConfirmDialogService } from '../../../core/services/confirm-dialog.service';
 import { ToastService } from '../../../core/services/toast.service';
+import { BackgroundRefreshComponent } from '../../../shared/components/background-refresh/background-refresh';
 import { DataTableComponent } from '../../../shared/components/data-table/data-table';
 import { DataTableColumn } from '../../../shared/components/data-table/data-table.model';
 import { TableCellTemplateDirective } from '../../../shared/components/data-table/table-cell-template.directive';
@@ -29,18 +30,16 @@ import { EmptyStateComponent } from '../../../shared/components/empty-state/empt
     DataTableComponent,
     TableCellTemplateDirective,
     CurrencyPipe,
+    BackgroundRefreshComponent,
   ],
   templateUrl: './vehicle-list.html',
 })
 export class VehicleListComponent implements OnInit {
-  private readonly carService = inject(CarService);
+  protected readonly carService = inject(CarService);
   private readonly toastService = inject(ToastService);
   private readonly confirmDialog = inject(ConfirmDialogService);
   private readonly destroyRef = inject(DestroyRef);
 
-  protected readonly cars = signal<RentCar[]>([]);
-  protected readonly isLoading = signal(true);
-  protected readonly errorMessage = signal<string | null>(null);
   protected readonly deletingCarId = signal<number | null>(null);
 
   protected readonly tableColumns: DataTableColumn<RentCar>[] = [
@@ -61,27 +60,11 @@ export class VehicleListComponent implements OnInit {
   ];
 
   ngOnInit(): void {
-    this.loadCars();
+    this.carService.loadCars();
   }
 
-  protected loadCars(): void {
-    this.errorMessage.set(null);
-    this.isLoading.set(true);
-
-    this.carService
-      .getCars()
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (cars) => {
-          this.cars.set(cars);
-          this.isLoading.set(false);
-        },
-        error: (error: Error) => {
-          this.cars.set([]);
-          this.errorMessage.set(error.message);
-          this.isLoading.set(false);
-        },
-      });
+  protected reloadCars(): void {
+    this.carService.loadCars();
   }
 
   protected async deleteCar(car: RentCar): Promise<void> {
@@ -109,7 +92,6 @@ export class VehicleListComponent implements OnInit {
         next: () => {
           this.toastService.success('Vehicle deleted successfully');
           this.deletingCarId.set(null);
-          this.loadCars();
         },
         error: () => {
           this.deletingCarId.set(null);
