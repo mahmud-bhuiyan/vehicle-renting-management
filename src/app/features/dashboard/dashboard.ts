@@ -50,7 +50,7 @@ export class DashboardComponent {
   protected readonly phases = [
     { name: 'Foundation', progress: 100, bar: 'from-indigo-500 to-violet-500' },
     { name: 'Auth & Routing', progress: 100, bar: 'from-violet-500 to-fuchsia-500' },
-    { name: 'Shared UI', progress: 0, bar: 'from-cyan-500 to-blue-500' },
+    { name: 'Shared UI', progress: 100, bar: 'from-cyan-500 to-blue-500' },
     { name: 'Feature Modules', progress: 0, bar: 'from-emerald-500 to-teal-500' },
   ];
 

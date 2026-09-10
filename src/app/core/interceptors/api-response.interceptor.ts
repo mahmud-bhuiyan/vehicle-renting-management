@@ -1,8 +1,12 @@
 import { HttpErrorResponse, HttpInterceptorFn, HttpResponse } from '@angular/common/http';
+import { inject } from '@angular/core';
 import { catchError, map, throwError } from 'rxjs';
 import { ApiResponse } from '../models/api-response.model';
+import { ToastService } from '../services/toast.service';
 
 export const apiResponseInterceptor: HttpInterceptorFn = (req, next) => {
+  const toastService = inject(ToastService);
+
   return next(req).pipe(
     map((event) => {
       if (!(event instanceof HttpResponse)) {
@@ -28,7 +32,12 @@ export const apiResponseInterceptor: HttpInterceptorFn = (req, next) => {
           error.message ??
           'Network request failed';
 
+        toastService.error(message);
         return throwError(() => new Error(message));
+      }
+
+      if (error instanceof Error) {
+        toastService.error(error.message);
       }
 
       return throwError(() => error);
