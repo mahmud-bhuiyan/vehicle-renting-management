@@ -1,5 +1,6 @@
 import { provideIcons } from '@ng-icons/core';
 import {
+  heroArrowLeft,
   heroArrowRightOnRectangle,
   heroBanknotes,
   heroBars3,
@@ -7,11 +8,16 @@ import {
   heroCalendarDays,
   heroChartBar,
   heroCheckCircle,
+  heroChevronDoubleLeft,
+  heroChevronDoubleRight,
+  heroChevronLeft,
+  heroChevronRight,
   heroClipboardDocumentList,
   heroExclamationCircle,
   heroEye,
   heroHome,
   heroInbox,
+  heroMagnifyingGlass,
   heroMoon,
   heroPencilSquare,
   heroPlus,
@@ -27,6 +33,7 @@ import {
 /** App-wide icon registry. Add icons here as features are built. */
 export const provideAppIcons = () =>
   provideIcons({
+    heroArrowLeft,
     heroArrowRightOnRectangle,
     heroBanknotes,
     heroBars3,
@@ -34,11 +41,16 @@ export const provideAppIcons = () =>
     heroCalendarDays,
     heroChartBar,
     heroCheckCircle,
+    heroChevronDoubleLeft,
+    heroChevronDoubleRight,
+    heroChevronLeft,
+    heroChevronRight,
     heroClipboardDocumentList,
     heroExclamationCircle,
     heroEye,
     heroHome,
     heroInbox,
+    heroMagnifyingGlass,
     heroMoon,
     heroPencilSquare,
     heroPlus,
