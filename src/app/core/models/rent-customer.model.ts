@@ -1,7 +1,13 @@
 export interface RentCustomer {
-  CustomerId?: number;
-  CustomerName: string;
-  CustomerCity?: string;
-  MobileNo?: string;
-  Email?: string;
+  customerId?: number;
+  customerName: string;
+  customerCity?: string;
+  mobileNo?: string;
+  email?: string;
+}
+
+export interface CustomerLedgerSummary {
+  totalBookings: number;
+  totalSpent: number;
+  lastBookingDate: string | null;
 }

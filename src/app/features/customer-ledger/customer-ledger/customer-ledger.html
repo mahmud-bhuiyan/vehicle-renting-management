@@ -1,0 +1,380 @@
+<div class="space-y-4">
+  <section
+    class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
+  >
+    <div class="min-w-0">
+      <h2 class="text-xl font-bold text-slate-900 dark:text-slate-100 sm:text-2xl">Customer Ledger</h2>
+      <p class="mt-0.5 text-sm text-slate-500 dark:text-slate-400">
+        View customers, booking history, and spending summaries.
+      </p>
+    </div>
+
+    <a
+      routerLink="/customer-ledger/create"
+      class="inline-flex min-h-10 shrink-0 items-center justify-center gap-2 rounded-xl bg-linear-to-r from-violet-600 to-fuchsia-600 px-4 py-2 text-sm font-semibold text-white shadow-md shadow-violet-500/30 transition hover:from-violet-700 hover:to-fuchsia-700"
+    >
+      <ng-icon name="heroPlus" class="size-5" />
+      Add customer
+    </a>
+  </section>
+
+  @if (isLoading()) {
+    <div
+      class="overflow-hidden rounded-2xl border border-white/80 bg-white shadow-lg shadow-slate-200/60 dark:border-white/10 dark:bg-surface-900 dark:shadow-black/20"
+    >
+      <div class="space-y-3 p-4 sm:p-6">
+        @for (row of [1, 2, 3, 4, 5]; track row) {
+          <div class="h-12 animate-pulse rounded-xl bg-slate-100 dark:bg-white/10"></div>
+        }
+      </div>
+    </div>
+  } @else if (errorMessage(); as error) {
+    <div
+      class="flex flex-col gap-3 rounded-2xl border border-rose-200 bg-rose-50 p-4 sm:flex-row sm:items-center sm:justify-between dark:border-rose-500/30 dark:bg-rose-500/10"
+    >
+      <div class="flex min-w-0 items-start gap-3">
+        <ng-icon name="heroExclamationCircle" class="mt-0.5 size-5 shrink-0 text-rose-600 dark:text-rose-400" />
+        <div class="min-w-0">
+          <p class="text-sm font-semibold text-rose-800 dark:text-rose-300">Failed to load customers</p>
+          <p class="mt-1 text-sm text-rose-700 dark:text-rose-400">{{ error }}</p>
+        </div>
+      </div>
+      <button
+        type="button"
+        class="inline-flex min-h-9 shrink-0 items-center justify-center rounded-lg border border-rose-300 bg-white px-3 py-1.5 text-sm font-semibold text-rose-700 transition hover:bg-rose-100 dark:border-rose-500/30 dark:bg-transparent dark:text-rose-300 dark:hover:bg-rose-500/10"
+        (click)="loadCustomers()"
+      >
+        Retry
+      </button>
+    </div>
+  } @else if (customers().length === 0) {
+    <app-empty-state
+      icon="heroUsers"
+      title="No customers yet"
+      message="Add your first customer to start tracking bookings and spend."
+    />
+  } @else {
+    <div class="relative max-w-sm">
+      <ng-icon
+        name="heroMagnifyingGlass"
+        class="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-slate-400"
+      />
+      <input
+        type="search"
+        class="block w-full rounded-xl border border-slate-200 bg-white py-2 pl-9 pr-3 text-sm text-slate-900 transition placeholder:text-slate-400 focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-500/20 dark:border-white/10 dark:bg-surface-800 dark:text-slate-100 dark:placeholder:text-slate-500"
+        placeholder="Search customers..."
+        [value]="searchQuery()"
+        (input)="onSearchInput($event)"
+      />
+    </div>
+
+    <div
+      class="overflow-hidden rounded-2xl border border-white/80 bg-white shadow-lg shadow-slate-200/60 dark:border-white/10 dark:bg-surface-900 dark:shadow-black/20"
+    >
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-slate-200 dark:divide-white/10">
+          <thead class="bg-slate-50 dark:bg-white/5">
+            <tr>
+              <th scope="col" class="w-10 px-4 py-3"></th>
+              <th
+                scope="col"
+                class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400"
+              >
+                Customer
+              </th>
+              <th
+                scope="col"
+                class="hidden px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 md:table-cell"
+              >
+                City
+              </th>
+              <th
+                scope="col"
+                class="hidden px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 lg:table-cell"
+              >
+                Mobile
+              </th>
+              <th
+                scope="col"
+                class="hidden px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 xl:table-cell"
+              >
+                Email
+              </th>
+              <th
+                scope="col"
+                class="hidden px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 sm:table-cell"
+              >
+                Bookings
+              </th>
+              <th
+                scope="col"
+                class="hidden px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 lg:table-cell"
+              >
+                Total spent
+              </th>
+              <th
+                scope="col"
+                class="hidden px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 xl:table-cell"
+              >
+                Last booking
+              </th>
+              <th
+                scope="col"
+                class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400"
+              >
+                Actions
+              </th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100 dark:divide-white/10">
+            @for (customer of filteredCustomers(); track customer.customerId) {
+              <tr class="transition hover:bg-slate-50 dark:hover:bg-white/5">
+                <td class="px-4 py-3">
+                  <button
+                    type="button"
+                    class="inline-flex size-8 items-center justify-center rounded-lg text-slate-500 transition hover:bg-violet-50 hover:text-violet-600 dark:hover:bg-violet-500/10 dark:hover:text-violet-400"
+                    [attr.aria-expanded]="isExpanded(customer)"
+                    [attr.aria-label]="isExpanded(customer) ? 'Collapse booking history' : 'Expand booking history'"
+                    (click)="toggleExpand(customer)"
+                  >
+                    <ng-icon
+                      [name]="isExpanded(customer) ? 'heroChevronUp' : 'heroChevronDown'"
+                      class="size-5"
+                    />
+                  </button>
+                </td>
+                <td class="px-4 py-3">
+                  <div class="flex items-center gap-3">
+                    <div
+                      class="flex size-9 shrink-0 items-center justify-center rounded-lg bg-linear-to-br from-violet-500 to-fuchsia-500 text-white"
+                    >
+                      <ng-icon name="heroUsers" class="size-4" />
+                    </div>
+                    <div class="min-w-0">
+                      <p class="truncate text-sm font-semibold text-slate-900 dark:text-slate-100">
+                        {{ customer.customerName }}
+                      </p>
+                      <p class="truncate text-xs text-slate-500 dark:text-slate-400 md:hidden">
+                        {{ customer.customerCity || customer.mobileNo || customer.email || '—' }}
+                      </p>
+                    </div>
+                  </div>
+                </td>
+                <td class="hidden px-4 py-3 text-sm text-slate-700 dark:text-slate-300 md:table-cell">
+                  {{ customer.customerCity || '—' }}
+                </td>
+                <td class="hidden px-4 py-3 text-sm text-slate-700 dark:text-slate-300 lg:table-cell">
+                  {{ customer.mobileNo || '—' }}
+                </td>
+                <td class="hidden px-4 py-3 text-sm text-slate-700 dark:text-slate-300 xl:table-cell">
+                  {{ customer.email || '—' }}
+                </td>
+                <td class="hidden px-4 py-3 text-right text-sm font-medium text-slate-900 dark:text-slate-100 sm:table-cell">
+                  @if (summaryFor(customer.customerId); as summary) {
+                    {{ summary.totalBookings }}
+                  } @else {
+                    <span class="text-slate-400">—</span>
+                  }
+                </td>
+                <td class="hidden px-4 py-3 text-right text-sm font-medium text-slate-900 dark:text-slate-100 lg:table-cell">
+                  @if (summaryFor(customer.customerId); as summary) {
+                    {{ summary.totalSpent | currency }}
+                  } @else {
+                    <span class="text-slate-400">—</span>
+                  }
+                </td>
+                <td class="hidden px-4 py-3 text-sm text-slate-700 dark:text-slate-300 xl:table-cell">
+                  @if (summaryFor(customer.customerId); as summary) {
+                    @if (summary.lastBookingDate) {
+                      {{ summary.lastBookingDate | date: 'mediumDate' }}
+                    } @else {
+                      —
+                    }
+                  } @else {
+                    <span class="text-slate-400">—</span>
+                  }
+                </td>
+                <td class="px-4 py-3 text-right">
+                  <div class="inline-flex items-center gap-1">
+                    <a
+                      [routerLink]="['/customer-ledger', customer.customerId, 'edit']"
+                      class="inline-flex size-8 items-center justify-center rounded-lg text-slate-500 transition hover:bg-violet-50 hover:text-violet-600 dark:hover:bg-violet-500/10 dark:hover:text-violet-400"
+                      aria-label="Edit customer"
+                    >
+                      <ng-icon name="heroPencilSquare" class="size-5" />
+                    </a>
+                    <button
+                      type="button"
+                      class="inline-flex size-8 items-center justify-center rounded-lg text-slate-500 transition hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-500/10 dark:hover:text-rose-400"
+                      aria-label="Delete customer"
+                      (click)="deleteCustomer(customer)"
+                    >
+                      <ng-icon name="heroTrash" class="size-5" />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+
+              @if (isExpanded(customer)) {
+                <tr class="bg-slate-50/80 dark:bg-white/2">
+                  <td colspan="9" class="px-4 py-4 sm:px-6">
+                    @if (isLoadingBookings(customer.customerId)) {
+                      <div class="space-y-2">
+                        @for (row of [1, 2, 3]; track row) {
+                          <div class="h-10 animate-pulse rounded-lg bg-slate-100 dark:bg-white/10"></div>
+                        }
+                      </div>
+                    } @else if (bookingErrorFor(customer.customerId); as bookingError) {
+                      <div
+                        class="flex flex-col gap-3 rounded-xl border border-rose-200 bg-rose-50 p-4 sm:flex-row sm:items-center sm:justify-between dark:border-rose-500/30 dark:bg-rose-500/10"
+                      >
+                        <div class="flex items-start gap-3">
+                          <ng-icon
+                            name="heroExclamationCircle"
+                            class="mt-0.5 size-5 shrink-0 text-rose-600 dark:text-rose-400"
+                          />
+                          <div>
+                            <p class="text-sm font-semibold text-rose-800 dark:text-rose-300">
+                              Failed to load booking history
+                            </p>
+                            <p class="mt-1 text-sm text-rose-700 dark:text-rose-400">{{ bookingError }}</p>
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          class="inline-flex min-h-9 shrink-0 items-center justify-center rounded-lg border border-rose-300 bg-white px-3 py-1.5 text-sm font-semibold text-rose-700 transition hover:bg-rose-100 dark:border-rose-500/30 dark:bg-transparent dark:text-rose-300 dark:hover:bg-rose-500/10"
+                          (click)="loadBookings(customer.customerId!)"
+                        >
+                          Retry
+                        </button>
+                      </div>
+                    } @else if (bookingsFor(customer.customerId).length === 0) {
+                      <div
+                        class="rounded-xl border border-dashed border-slate-200 px-4 py-8 text-center dark:border-white/10"
+                      >
+                        <ng-icon name="heroCalendarDays" class="mx-auto size-8 text-slate-400" />
+                        <p class="mt-2 text-sm font-medium text-slate-700 dark:text-slate-300">
+                          No bookings yet
+                        </p>
+                        <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                          This customer has not made any bookings.
+                        </p>
+                      </div>
+                    } @else {
+                      <div class="space-y-4">
+                        @if (summaryFor(customer.customerId); as summary) {
+                          <div class="grid gap-3 sm:grid-cols-3">
+                            <div
+                              class="rounded-xl border border-slate-200 bg-white p-4 dark:border-white/10 dark:bg-surface-900"
+                            >
+                              <p class="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                                Total bookings
+                              </p>
+                              <p class="mt-1 text-2xl font-bold text-slate-900 dark:text-slate-100">
+                                {{ summary.totalBookings }}
+                              </p>
+                            </div>
+                            <div
+                              class="rounded-xl border border-slate-200 bg-white p-4 dark:border-white/10 dark:bg-surface-900"
+                            >
+                              <p class="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                                Total spent
+                              </p>
+                              <p class="mt-1 text-2xl font-bold text-slate-900 dark:text-slate-100">
+                                {{ summary.totalSpent | currency }}
+                              </p>
+                            </div>
+                            <div
+                              class="rounded-xl border border-slate-200 bg-white p-4 dark:border-white/10 dark:bg-surface-900"
+                            >
+                              <p class="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                                Last booking
+                              </p>
+                              <p class="mt-1 text-lg font-bold text-slate-900 dark:text-slate-100">
+                                @if (summary.lastBookingDate) {
+                                  {{ summary.lastBookingDate | date: 'mediumDate' }}
+                                } @else {
+                                  —
+                                }
+                              </p>
+                            </div>
+                          </div>
+                        }
+
+                        <div class="overflow-x-auto rounded-xl border border-slate-200 dark:border-white/10">
+                          <table class="min-w-full divide-y divide-slate-200 dark:divide-white/10">
+                            <thead class="bg-white dark:bg-surface-900">
+                              <tr>
+                                <th
+                                  scope="col"
+                                  class="px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400"
+                                >
+                                  Booking ID
+                                </th>
+                                <th
+                                  scope="col"
+                                  class="px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400"
+                                >
+                                  Car ID
+                                </th>
+                                <th
+                                  scope="col"
+                                  class="px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400"
+                                >
+                                  Date
+                                </th>
+                                <th
+                                  scope="col"
+                                  class="px-4 py-2.5 text-right text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400"
+                                >
+                                  Discount
+                                </th>
+                                <th
+                                  scope="col"
+                                  class="px-4 py-2.5 text-right text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400"
+                                >
+                                  Total
+                                </th>
+                              </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100 bg-white dark:divide-white/10 dark:bg-surface-900">
+                              @for (booking of bookingsFor(customer.customerId); track booking.bookingId ?? booking.bookingDate) {
+                                <tr>
+                                  <td class="px-4 py-2.5 text-sm text-slate-700 dark:text-slate-300">
+                                    {{ booking.bookingId ?? '—' }}
+                                  </td>
+                                  <td class="px-4 py-2.5 text-sm text-slate-700 dark:text-slate-300">
+                                    {{ booking.carId }}
+                                  </td>
+                                  <td class="px-4 py-2.5 text-sm text-slate-700 dark:text-slate-300">
+                                    {{ booking.bookingDate | date: 'medium' }}
+                                  </td>
+                                  <td class="px-4 py-2.5 text-right text-sm text-slate-700 dark:text-slate-300">
+                                    {{ (booking.discount ?? 0) | currency }}
+                                  </td>
+                                  <td class="px-4 py-2.5 text-right text-sm font-medium text-slate-900 dark:text-slate-100">
+                                    {{ booking.totalBillAmount | currency }}
+                                  </td>
+                                </tr>
+                              }
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    }
+                  </td>
+                </tr>
+              }
+            } @empty {
+              <tr>
+                <td colspan="9" class="px-4 py-10 text-center text-sm text-slate-500 dark:text-slate-400">
+                  No customers match your search.
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  }
+</div>

@@ -1,0 +1,174 @@
+<div
+  class="overflow-hidden rounded-2xl border border-white/80 bg-white shadow-lg shadow-slate-200/60 dark:border-white/10 dark:bg-surface-900 dark:shadow-black/20 lg:rounded-3xl"
+>
+  <div class="grid lg:grid-cols-[minmax(0,320px)_1fr]">
+    <aside
+      class="relative overflow-hidden border-b border-slate-100 bg-linear-to-br from-violet-600 via-fuchsia-600 to-indigo-500 p-5 dark:border-white/10 sm:p-6 lg:border-b-0 lg:border-r"
+    >
+      <div
+        class="pointer-events-none absolute -right-8 -top-8 size-32 rounded-full bg-white/10 blur-2xl"
+      ></div>
+
+      <div class="relative z-10">
+        <div
+          class="inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-xs font-semibold text-white backdrop-blur-md"
+        >
+          <ng-icon name="heroUsers" class="size-3.5" />
+          Customer profile
+        </div>
+
+        <div class="mt-5 rounded-2xl border border-white/20 bg-black/20 p-5 shadow-xl backdrop-blur-sm">
+          <div
+            class="mx-auto flex size-16 items-center justify-center rounded-2xl bg-white/15 text-white backdrop-blur-md"
+          >
+            <ng-icon name="heroUsers" class="size-8" />
+          </div>
+
+          <div class="mt-4 space-y-2 text-center">
+            <p class="text-lg font-bold text-white">{{ previewTitle() }}</p>
+            <p class="text-sm text-violet-100">{{ previewSubtitle() }}</p>
+          </div>
+
+          <div class="mt-5 space-y-2">
+            @if (formValue().email) {
+              <div class="flex items-center gap-2 rounded-xl bg-white/10 px-3 py-2 text-sm text-violet-100">
+                <ng-icon name="heroEnvelope" class="size-4 shrink-0" />
+                <span class="truncate">{{ formValue().email }}</span>
+              </div>
+            }
+            @if (formValue().mobileNo) {
+              <div class="flex items-center gap-2 rounded-xl bg-white/10 px-3 py-2 text-sm text-violet-100">
+                <ng-icon name="heroPhone" class="size-4 shrink-0" />
+                <span class="truncate">{{ formValue().mobileNo }}</span>
+              </div>
+            }
+            @if (formValue().customerCity) {
+              <div class="flex items-center gap-2 rounded-xl bg-white/10 px-3 py-2 text-sm text-violet-100">
+                <ng-icon name="heroMapPin" class="size-4 shrink-0" />
+                <span class="truncate">{{ formValue().customerCity }}</span>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <form class="flex min-w-0 flex-col" [formGroup]="form" (ngSubmit)="onSubmit()">
+      <div class="flex-1 space-y-8 p-5 sm:p-6 lg:p-8">
+        <section class="space-y-4">
+          <div class="flex items-center gap-3">
+            <div
+              class="flex size-9 shrink-0 items-center justify-center rounded-xl bg-violet-100 text-violet-600 dark:bg-violet-500/15 dark:text-violet-300"
+            >
+              <ng-icon name="heroUsers" class="size-5" />
+            </div>
+            <div>
+              <h3 class="text-sm font-bold text-slate-900 dark:text-slate-100">Basic information</h3>
+              <p class="text-xs text-slate-500 dark:text-slate-400">Name and location</p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div class="sm:col-span-2">
+              <label
+                class="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300"
+                for="customerName"
+              >
+                Customer name
+              </label>
+              <input
+                id="customerName"
+                type="text"
+                formControlName="customerName"
+                placeholder="e.g. Jane Cooper"
+                class="block w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-900 transition placeholder:text-slate-400 focus:border-violet-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-violet-500/20 dark:border-white/10 dark:bg-surface-800 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:bg-surface-800"
+                [class.border-rose-500]="fieldError('customerName')"
+              />
+              @if (fieldError('customerName'); as err) {
+                <p class="mt-1.5 text-xs text-rose-600 dark:text-rose-400">{{ err }}</p>
+              }
+            </div>
+
+            <div>
+              <label
+                class="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300"
+                for="customerCity"
+              >
+                City
+              </label>
+              <input
+                id="customerCity"
+                type="text"
+                formControlName="customerCity"
+                placeholder="e.g. Austin"
+                class="block w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-900 transition placeholder:text-slate-400 focus:border-violet-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-violet-500/20 dark:border-white/10 dark:bg-surface-800 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:bg-surface-800"
+              />
+            </div>
+
+            <div>
+              <label
+                class="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300"
+                for="mobileNo"
+              >
+                Mobile no
+              </label>
+              <input
+                id="mobileNo"
+                type="tel"
+                formControlName="mobileNo"
+                placeholder="10-digit mobile"
+                class="block w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-900 transition placeholder:text-slate-400 focus:border-violet-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-violet-500/20 dark:border-white/10 dark:bg-surface-800 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:bg-surface-800"
+                [class.border-rose-500]="fieldError('mobileNo')"
+              />
+              @if (fieldError('mobileNo'); as err) {
+                <p class="mt-1.5 text-xs text-rose-600 dark:text-rose-400">{{ err }}</p>
+              }
+            </div>
+
+            <div class="sm:col-span-2">
+              <label
+                class="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300"
+                for="email"
+              >
+                Email
+              </label>
+              <input
+                id="email"
+                type="email"
+                formControlName="email"
+                placeholder="e.g. jane@example.com"
+                class="block w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-900 transition placeholder:text-slate-400 focus:border-violet-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-violet-500/20 dark:border-white/10 dark:bg-surface-800 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:bg-surface-800"
+                [class.border-rose-500]="fieldError('email')"
+              />
+              @if (fieldError('email'); as err) {
+                <p class="mt-1.5 text-xs text-rose-600 dark:text-rose-400">{{ err }}</p>
+              }
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <div
+        class="flex flex-col-reverse gap-3 border-t border-slate-100 bg-slate-50/80 px-5 py-4 dark:border-white/10 dark:bg-white/2 sm:flex-row sm:justify-end sm:px-6 lg:px-8"
+      >
+        <button
+          type="button"
+          class="inline-flex min-h-11 items-center justify-center rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 dark:border-white/10 dark:bg-surface-800 dark:text-slate-200 dark:hover:bg-white/5"
+          (click)="onCancel()"
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          class="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-linear-to-r from-violet-600 to-fuchsia-600 px-5 py-2.5 text-sm font-semibold text-white shadow-md shadow-violet-500/30 transition hover:from-violet-700 hover:to-fuchsia-700 disabled:cursor-not-allowed disabled:opacity-60"
+          [disabled]="isSubmitting()"
+        >
+          @if (isSubmitting()) {
+            <span class="size-4 animate-spin rounded-full border-2 border-white/30 border-t-white"></span>
+          }
+          {{ submitLabel() }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
