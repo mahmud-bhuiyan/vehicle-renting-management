@@ -11,11 +11,12 @@ import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } fro
 import { NgIcon } from '@ng-icons/core';
 import { filter } from 'rxjs';
 import { AuthService } from '../../core/services/auth.service';
+import { ThemeToggleComponent } from '../../shared/components/theme-toggle/theme-toggle';
 
 @Component({
   selector: 'app-admin-layout',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, NgIcon],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, NgIcon, ThemeToggleComponent],
   templateUrl: './admin-layout.html',
 })
 export class AdminLayoutComponent {

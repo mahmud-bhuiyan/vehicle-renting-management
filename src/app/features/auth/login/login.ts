@@ -1,19 +1,23 @@
+import { LowerCasePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { NgIcon } from '@ng-icons/core';
 import { AuthService } from '../../../core/services/auth.service';
+import { ToastService } from '../../../core/services/toast.service';
+import { ThemeToggleComponent } from '../../../shared/components/theme-toggle/theme-toggle';
 
 @Component({
   selector: 'app-login',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ReactiveFormsModule, NgIcon],
+  imports: [LowerCasePipe, ReactiveFormsModule, NgIcon, ThemeToggleComponent],
   templateUrl: './login.html',
 })
 export class LoginComponent {
   private readonly formBuilder = inject(FormBuilder);
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly toastService = inject(ToastService);
 
   protected readonly errorMessage = signal('');
 
@@ -21,6 +25,18 @@ export class LoginComponent {
     username: ['', Validators.required],
     password: ['', Validators.required],
   });
+
+  protected readonly demoCredentials = [
+    { label: 'Admin', username: 'admin', password: 'admin123' },
+  ];
+
+  protected fillCredentials(credential: { username: string; password: string }): void {
+    this.errorMessage.set('');
+    this.form.patchValue({
+      username: credential.username,
+      password: credential.password,
+    });
+  }
 
   protected onSubmit(): void {
     this.errorMessage.set('');
@@ -38,5 +54,6 @@ export class LoginComponent {
     }
 
     this.errorMessage.set('Invalid username or password');
+    this.toastService.error('Invalid username or password');
   }
 }
